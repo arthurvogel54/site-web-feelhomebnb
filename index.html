@@ -34,16 +34,32 @@
       z-index:1000;
       display:flex;align-items:center;justify-content:center;
       flex-direction:column;gap:18px;
+      /* CSS fallback: always disappear after 4s even if JS fails */
+      animation: loaderOut 0.7s ease-in-out 3.8s forwards;
+    }
+    @keyframes loaderOut{
+      to{ opacity:0; pointer-events:none; visibility:hidden; }
     }
     .loader-key{
       width:90px;height:54px;
       opacity:0;transform:translateY(-24px);
+      animation: loaderKeyIn 0.7s ease-out 0.3s forwards;
+    }
+    @keyframes loaderKeyIn{
+      to{ opacity:1; transform:translateY(0); }
     }
     .loader-brand{
       font-family:'Cormorant Garamond',serif;
       color:var(--gold);font-size:15px;letter-spacing:5px;
       opacity:0;
+      animation: loaderKeyIn 0.7s ease-out 0.8s forwards;
     }
+    /* CSS fallback for content elements if GSAP never runs */
+    #logo,#hero-text,#properties,#window-arch,#scroll-hint{
+      animation: contentIn 0.9s ease-out 4.3s forwards;
+    }
+    .orn{ animation: contentIn 0.7s ease-out 4.5s forwards; }
+    @keyframes contentIn{ to{ opacity:1; } }
 
     /* ── HERO ────────────────────────────────── */
     #hero{
@@ -433,9 +449,20 @@
 <script>
 (function(){
 'use strict';
+if(typeof gsap==='undefined'){ console.error('GSAP not loaded'); return; }
 gsap.registerPlugin(ScrollTrigger);
 
-/* ── THREE.JS SETUP ─────────────────────── */
+/* ── Shared mutable state (declared first so try/catch can assign) ── */
+let keyGroup=null, particles=null, pGeo=null, pMat=null;
+let introComplete=false, keyBaseY=0;
+let parallaxX=0, parallaxY=0, mouseX=0, mouseY=0, pTime=0;
+const PC=160;
+
+/* ══════════════════════════════════════════
+   THREE.JS — isolated so any GL error won't
+   break GSAP or the rest of the page
+══════════════════════════════════════════ */
+try {
 const canvas  = document.getElementById('key-canvas');
 const W = window.innerWidth, H = window.innerHeight;
 
@@ -499,7 +526,8 @@ const goldMat2 = new THREE.MeshStandardMaterial({
 });
 
 /* ── KEY GEOMETRY ────────────────────────── */
-const keyGroup = new THREE.Group();
+const _kg = new THREE.Group();
+keyGroup = _kg;
 
 // Bow: 4 interlocked rings in a 2×2 clover
 const R = 0.30, tube = 0.092, off = 0.25;
@@ -553,7 +581,6 @@ keyGroup.scale.setScalar(0);
 scene.add(keyGroup);
 
 /* ── PARTICLE TRAIL ──────────────────────── */
-const PC = 200;
 const pPos = new Float32Array(PC * 3);
 
 // Build a sweeping arc trail
@@ -576,10 +603,10 @@ pg.addColorStop(1,  'rgba(212,175,55,0)');
 pctx.fillStyle = pg;
 pctx.fillRect(0,0,32,32);
 
-const pGeo = new THREE.BufferGeometry();
+pGeo = new THREE.BufferGeometry();
 pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
 
-const pMat = new THREE.PointsMaterial({
+pMat = new THREE.PointsMaterial({
   size: 0.065,
   map: new THREE.CanvasTexture(pc2d),
   color: new THREE.Color(0xffd740),
@@ -587,18 +614,13 @@ const pMat = new THREE.PointsMaterial({
   depthWrite: false,
   blending: THREE.AdditiveBlending
 });
-const particles = new THREE.Points(pGeo, pMat);
-particles.position.set(0.3, -0.2, -0.4);
-particles.visible = false;
-scene.add(particles);
+const _pts = new THREE.Points(pGeo, pMat);
+_pts.position.set(0.3, -0.2, -0.4);
+_pts.visible = false;
+scene.add(_pts);
+particles = _pts;
 
 /* ── ANIMATION STATE ─────────────────────── */
-let mouseX=0, mouseY=0;
-let parallaxX=0, parallaxY=0;
-let keyBaseY = 0;
-let introComplete = false;
-let pTime = 0;
-
 document.addEventListener('mousemove', e=>{
   mouseX = (e.clientX/window.innerWidth  - 0.5) * 2;
   mouseY = (e.clientY/window.innerHeight - 0.5) * 2;
@@ -648,7 +670,15 @@ window.addEventListener('resize',()=>{
   renderer.setSize(w, h);
 });
 
-/* ── LOADING SEQUENCE (GSAP) ─────────────── */
+} catch(err) {
+  console.warn('[Feel\'HomeBnb] 3D key disabled:', err.message || err);
+  const cv = document.getElementById('key-canvas');
+  if(cv) cv.style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════
+   GSAP — always runs, 3D tweens only if key loaded
+═══════════════════════════════════════════ */
 const introTl = gsap.timeline({paused:true});
 
 // 1. Fade loader out
@@ -656,12 +686,14 @@ introTl.to('#loader',{opacity:0, duration:.7, ease:'power2.inOut',
   onComplete:()=>{ document.getElementById('loader').style.display='none'; }
 });
 
-// 2. Key drops + scales in
-introTl.to(keyGroup.position,{y:0, duration:1.3, ease:'back.out(1.4)'}, '-=0.1');
-introTl.to(keyGroup.scale,{x:1,y:1,z:1, duration:1.1, ease:'back.out(1.8)'}, '<');
+// 2. Key drops + scales in (only if Three.js succeeded)
+if(keyGroup){
+  introTl.to(keyGroup.position,{y:0, duration:1.3, ease:'back.out(1.4)'}, '-=0.1');
+  introTl.to(keyGroup.scale,{x:1,y:1,z:1, duration:1.1, ease:'back.out(1.8)'}, '<');
+}
 
 // 3. Particles appear
-introTl.call(()=>{ particles.visible = true; }, null, '-=0.6');
+introTl.call(()=>{ if(particles) particles.visible = true; }, null, '-=0.6');
 
 // 4. Logo fades in
 introTl.fromTo('#logo',
