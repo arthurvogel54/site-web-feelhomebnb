@@ -67,28 +67,33 @@
       overflow:hidden;
     }
 
-    /* right-side luxury room photo */
+    /* right-side luxury room photo — cream Haussmann interior */
     .bg-room{
       position:absolute;right:0;top:0;
       width:52%;height:100%;
-      background:url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=900&fit=crop&q=80') center/cover no-repeat;
+      background:
+        url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=900&fit=crop&q=80') center/cover no-repeat;
       z-index:0;
     }
 
-    /* blue wall gradient covering left+center */
+    /* blue wall gradient — layered for depth + luminous center glow */
     .bg-wall{
       position:absolute;inset:0;z-index:1;
       background:
-        radial-gradient(ellipse 55% 65% at 42% 44%, rgba(30,38,160,0.85) 0%, rgba(13,16,96,0.92) 35%, rgba(5,5,20,0.97) 65%, rgba(5,5,15,1) 85%),
+        /* luminous halo where the key floats */
+        radial-gradient(ellipse 38% 42% at 46% 46%, rgba(50,70,230,0.55) 0%, transparent 65%),
+        /* royal blue core */
+        radial-gradient(ellipse 62% 70% at 42% 44%, rgba(22,34,160,0.96) 0%, rgba(10,14,80,0.98) 42%, rgba(5,5,18,1) 75%),
+        /* dark-to-blue-to-transparent horizontal spread */
         linear-gradient(to right,
           #05050f 0%,
-          #05050f 8%,
-          #09093a 18%,
-          #0d1060 30%,
-          #1a237e 48%,
-          rgba(20,28,110,0.82) 60%,
-          rgba(14,16,80,0.35) 72%,
-          transparent 82%
+          #05050f 6%,
+          #08083a 16%,
+          #0e1270 28%,
+          #1a237e 46%,
+          rgba(20,28,120,0.80) 60%,
+          rgba(14,16,70,0.28) 73%,
+          transparent 83%
         );
     }
 
@@ -171,27 +176,30 @@
     /* ── ARCHED WINDOW ───────────────────────── */
     #window-arch{
       position:absolute;
-      right:clamp(14px,3.5vw,50px);
-      top:clamp(24px,5vh,52px);
-      width:clamp(200px,24vw,340px);
+      right:clamp(8px,2.5vw,32px);
+      top:clamp(16px,3vh,36px);
+      width:clamp(220px,28vw,400px);
       z-index:8;opacity:0;
     }
     .win-outer{
       position:relative;
-      padding-top:128%;
-      background:#ede3ce;
+      padding-top:130%;
+      background:#e8ddc8;
       border-radius:50% 50% 4px 4px / 18% 18% 0 0;
       box-shadow:
-        0 30px 80px rgba(0,0,0,.55),
-        inset 0 0 0 10px #fff,
-        inset 0 0 0 13px #d6cba8;
+        0 40px 100px rgba(0,0,0,.65),
+        0 0 0 2px rgba(212,175,55,0.15),
+        inset 0 0 0 11px #fff,
+        inset 0 0 0 14px #d6cba8;
     }
     .win-view{
       position:absolute;
       inset:13px;
       border-radius:calc(50% - 8px) calc(50% - 8px) 2px 2px / calc(18% - 4px) calc(18% - 4px) 0 0;
       overflow:hidden;
-      background:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&fit=crop&q=80') center/cover no-repeat,
+      background:
+        url('https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Nancy_place_Stanislas_grilles.jpg&width=800') center 30%/cover no-repeat,
+        url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Nancy_Stanislas_1.jpg/1280px-Nancy_Stanislas_1.jpg') center/cover no-repeat,
         linear-gradient(160deg,#f9c75b 0%,#e8a830 40%,#c47820 80%,#7a4010 100%);
     }
     /* window mullions */
@@ -476,37 +484,65 @@ const scene  = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, W/H, 0.1, 100);
 camera.position.set(0, 0, 6);
 
-/* Lighting */
-scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+/* Lighting — 3-point setup matching the concept art */
+scene.add(new THREE.AmbientLight(0xfff8e0, 0.35));
 
-const sun = new THREE.DirectionalLight(0xfff6d0, 2.2);
-sun.position.set(4, 7, 5);
-scene.add(sun);
+// Key light: strong warm-white from top-left (creates the bright highlight on key top)
+const keyLight = new THREE.DirectionalLight(0xfff8d0, 3.0);
+keyLight.position.set(-3, 6, 5);
+scene.add(keyLight);
 
-const fill = new THREE.DirectionalLight(0xc8a028, 1.6);
-fill.position.set(-4, -2, 3);
+// Fill light: golden from bottom-right (warm bounce light)
+const fill = new THREE.DirectionalLight(0xd4920a, 1.8);
+fill.position.set(5, -3, 3);
 scene.add(fill);
 
-const pt1 = new THREE.PointLight(0xffd060, 2.8, 12);
-pt1.position.set(1, 3, 4);
-scene.add(pt1);
-
-const rim = new THREE.PointLight(0xffe090, 1.4, 14);
-rim.position.set(-5, 2, 2);
+// Rim light: from behind-right (creates edge glow)
+const rim = new THREE.DirectionalLight(0xffe8a0, 2.0);
+rim.position.set(4, 2, -3);
 scene.add(rim);
 
-/* Environment map (simple equirectangular gradient) */
+// Point light: close to key for sparkle
+const pt1 = new THREE.PointLight(0xffd060, 3.5, 10);
+pt1.position.set(0.5, 2, 4);
+scene.add(pt1);
+
+/* Environment map — rich gold+blue sky for metallic reflections */
 (function buildEnv(){
   const ec = document.createElement('canvas');
-  ec.width = 512; ec.height = 256;
+  ec.width = 1024; ec.height = 512;
   const ctx = ec.getContext('2d');
-  const g = ctx.createLinearGradient(0,0,512,0);
-  g.addColorStop(0,   '#0a0a38');
-  g.addColorStop(0.25,'#1a1a6e');
-  g.addColorStop(0.5, '#4a3a10');
-  g.addColorStop(0.75,'#8a6820');
-  g.addColorStop(1,   '#2a1a08');
-  ctx.fillStyle = g; ctx.fillRect(0,0,512,256);
+
+  // Sky gradient (top): deep blue → warm horizon
+  const sky = ctx.createLinearGradient(0,0,0,256);
+  sky.addColorStop(0,   '#080830');
+  sky.addColorStop(0.4, '#1a237e');
+  sky.addColorStop(0.7, '#2a3090');
+  sky.addColorStop(1,   '#4a3020');
+  ctx.fillStyle = sky; ctx.fillRect(0,0,1024,256);
+
+  // Ground gradient (bottom): warm gold floor reflection
+  const gnd = ctx.createLinearGradient(0,256,0,512);
+  gnd.addColorStop(0,   '#7a5010');
+  gnd.addColorStop(0.4, '#c8900a');
+  gnd.addColorStop(0.8, '#e8b020');
+  gnd.addColorStop(1,   '#f0d040');
+  ctx.fillStyle = gnd; ctx.fillRect(0,256,1024,256);
+
+  // Bright window light spot (top-left) — main specular source
+  const spot = ctx.createRadialGradient(200,100,0,200,100,150);
+  spot.addColorStop(0,   'rgba(255,240,180,1)');
+  spot.addColorStop(0.3, 'rgba(255,210,100,0.7)');
+  spot.addColorStop(0.7, 'rgba(255,170,50,0.3)');
+  spot.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = spot; ctx.fillRect(0,0,1024,512);
+
+  // Right-side warm light spot
+  const spot2 = ctx.createRadialGradient(900,300,0,900,300,120);
+  spot2.addColorStop(0,   'rgba(255,200,60,0.8)');
+  spot2.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = spot2; ctx.fillRect(0,0,1024,512);
+
   const et = new THREE.CanvasTexture(ec);
   et.mapping = THREE.EquirectangularReflectionMapping;
   const pmrem = new THREE.PMREMGenerator(renderer);
@@ -515,26 +551,30 @@ scene.add(rim);
   pmrem.dispose(); et.dispose();
 })();
 
-/* Gold material */
-const goldMat = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0xd0a830),
-  metalness: 0.96, roughness: 0.08, envMapIntensity: 1.2
+/* Gold material — MeshPhysicalMaterial for clearcoat + better reflections */
+const goldMat = new THREE.MeshPhysicalMaterial({
+  color: new THREE.Color(0xc89b28),
+  metalness: 1.0, roughness: 0.06,
+  clearcoat: 0.6, clearcoatRoughness: 0.08,
+  envMapIntensity: 2.5, reflectivity: 1.0
 });
-const goldMat2 = new THREE.MeshStandardMaterial({
+const goldMat2 = new THREE.MeshPhysicalMaterial({
   color: new THREE.Color(0xe8c040),
-  metalness: 0.9, roughness: 0.14, envMapIntensity: 1.0
+  metalness: 0.95, roughness: 0.10,
+  clearcoat: 0.4, clearcoatRoughness: 0.1,
+  envMapIntensity: 2.0
 });
 
 /* ── KEY GEOMETRY ────────────────────────── */
 const _kg = new THREE.Group();
 keyGroup = _kg;
 
-// Bow: 4 interlocked rings in a 2×2 clover
-const R = 0.30, tube = 0.092, off = 0.25;
+// Bow: 4 interlocked rings — high segment count for smooth gold look
+const R = 0.32, tube = 0.10, off = 0.27;
 [[-off,off],[ off,off],[-off,-off],[off,-off]].forEach(([x,y])=>{
-  const m = new THREE.Mesh(new THREE.TorusGeometry(R,tube,22,90), goldMat);
+  const m = new THREE.Mesh(new THREE.TorusGeometry(R, tube, 40, 140), goldMat);
   m.position.set(x, y, 0);
-  keyGroup.add(m);
+  _kg.add(m);
 });
 
 // Centre sphere bridging the 4 rings
