@@ -157,7 +157,7 @@
     margin-bottom: 40px;
     text-shadow: 0 2px 12px rgba(0,0,0,.7);
   }
-  .cta-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .cta-row { display: flex; gap: 14px; align-items: center; flex-wrap: nowrap; }
   .btn {
     display: inline-flex; align-items: center; gap: 12px;
     padding: 17px 30px;
@@ -184,7 +184,8 @@
     backdrop-filter: blur(6px);
     border: 1px solid rgba(216,180,106,.45);
     box-shadow: none;
-    padding: 17px 28px;
+    padding: 17px 20px;
+    font-size: 14px;
   }
   .btn-ghost:hover { background: rgba(216,180,106,.12); transform: translateY(-1px); }
 
@@ -342,7 +343,7 @@
     z-index: 1;
     border-radius: 18px;
   }
-  .property-label { z-index: 2; }
+  .property-label {
     position: absolute;
     left: 14px; bottom: 12px;
     font-family: 'Cormorant Garamond', serif;
@@ -350,7 +351,7 @@
     letter-spacing: 2px;
     color: var(--ivory);
     text-shadow: 0 2px 8px rgba(0,0,0,.8);
-    z-index: 2;
+    z-index: 3;
   }
   .property-label small {
     display: block;
