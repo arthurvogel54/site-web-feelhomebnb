@@ -71,21 +71,27 @@
   let loaded = false;
   let loadP = null;
 
+  const LS_KEY = 'image-slots';
+  function lsLoad() {
+    try { const r = localStorage.getItem(LS_KEY); return r ? JSON.parse(r) : null; } catch { return null; }
+  }
+  function lsSave() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(slots)); } catch {}
+  }
+
   function load() {
     if (loadP) return loadP;
     loadP = fetch(STATE_FILE)
       .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
       .then((j) => {
-        // Merge: sidecar loses to any in-memory change that raced ahead of
-        // the fetch (drop or clear) so neither is clobbered by hydration.
-        if (j && typeof j === 'object') {
-          const merged = Object.assign({}, j, slots);
-          // A framing-only write that raced ahead of hydration must not
-          // drop a user image that's only on disk — inherit u from the
-          // sidecar for any in-memory entry that lacks one.
+        // Fallback: use localStorage when the sidecar file is absent (standalone server).
+        const source = (j && typeof j === 'object') ? j : lsLoad();
+        if (source) {
+          const merged = Object.assign({}, source, slots);
           for (const k in slots) {
-            if (merged[k] && !merged[k].u && j[k]) {
-              merged[k].u = typeof j[k] === 'string' ? j[k] : j[k].u;
+            if (merged[k] && !merged[k].u && source[k]) {
+              merged[k].u = typeof source[k] === 'string' ? source[k] : source[k].u;
             }
           }
           for (const id of tombstones) delete merged[id];
@@ -93,7 +99,6 @@
         }
         tombstones.clear();
       })
-      .catch(() => {})
       .then(() => { loaded = true; subs.forEach((fn) => fn()); });
     return loadP;
   }
@@ -107,7 +112,7 @@
   function save() {
     if (saving) { saveDirty = true; return; }
     const w = window.omelette && window.omelette.writeFile;
-    if (!w) return;
+    if (!w) { lsSave(); return; }
     saving = true;
     Promise.resolve(w(STATE_FILE, JSON.stringify(slots)))
       .catch(() => {})
@@ -590,10 +595,9 @@
       this._ring.style.borderRadius = mask ? '' : radius;
       this._ring.style.display = mask ? 'none' : '';
 
-      // Controls and reframe entry gate on this so share links stay read-only.
-      const editable = !!(window.omelette && window.omelette.writeFile);
-      this.toggleAttribute('data-editable', editable);
-      this._sub.style.display = editable ? '' : 'none';
+      // Always editable: standalone server uses localStorage, omelette uses sidecar.
+      this.toggleAttribute('data-editable', true);
+      this._sub.style.display = '';
 
       // Content. The sidecar is also writable by the agent's write_file
       // tool, so its value isn't guaranteed canvas-originated — only accept
