@@ -334,13 +334,13 @@
   }
   .property:hover { transform: translateY(-4px); box-shadow: 0 30px 60px rgba(0,0,0,.7), 0 0 0 1px rgba(243,223,155,.4); }
   .property-slot { width: 100%; height: 100%; display: block; }
-  .property::after {
-    content: "";
+  .property-gradient {
     position: absolute;
     inset: 0;
     background: linear-gradient(to bottom, transparent 40%, rgba(3,8,31,.55) 70%, rgba(3,8,31,.88) 100%);
     pointer-events: none;
     z-index: 1;
+    border-radius: 18px;
   }
   .property-label { z-index: 2; }
     position: absolute;
@@ -702,31 +702,38 @@
     </div>
     <div class="property">
       <image-slot id="prop-1" class="property-slot" shape="rect" placeholder="Salon — Appartement Stanislas"></image-slot>
-      <div class="property-label" style=""><small style="">Feelhomebnb</small>Studio Proche Centre</div>
+      <div class="property-gradient"></div>
+      <div class="property-label"><small>Feelhomebnb</small>Studio Proche Centre</div>
     </div>
     <div class="property">
       <image-slot id="prop-2" class="property-slot" shape="rect" placeholder="Salon — Vieille Ville"></image-slot>
-      <div class="property-label" style=""><small style="">Feelhomebnb</small>Havre de Paix</div>
+      <div class="property-gradient"></div>
+      <div class="property-label"><small>Feelhomebnb</small>Havre de Paix</div>
     </div>
     <div class="property">
       <image-slot id="prop-3" class="property-slot" shape="rect" placeholder="Salle à manger — Carrière"></image-slot>
-      <div class="property-label" style=""><small style="">Feelhomebnb</small>Nid des Vosges</div>
+      <div class="property-gradient"></div>
+      <div class="property-label"><small>Feelhomebnb</small>Nid des Vosges</div>
     </div>
     <div class="property">
       <image-slot id="prop-4" class="property-slot" shape="rect" placeholder="Chambre — Suite Art Nouveau"></image-slot>
-      <div class="property-label" style=""><small style="">Feelhomebnb</small>Le Petit Stanislas</div>
+      <div class="property-gradient"></div>
+      <div class="property-label"><small>Feelhomebnb</small>Le Petit Stanislas</div>
     </div>
     <div class="property wide">
       <image-slot id="prop-5" class="property-slot" shape="rect" placeholder="Salon — Saint-Épvre"></image-slot>
-      <div class="property-label" style=""><small style="">Feelhomebnb</small>Le Petit Cocon</div>
+      <div class="property-gradient"></div>
+      <div class="property-label"><small>Feelhomebnb</small>Le Petit Cocon</div>
     </div>
     <div class="property wide">
       <image-slot id="prop-6" class="property-slot" shape="rect" placeholder="Chambre — Pépinière"></image-slot>
-      <div class="property-label" style=""><small style="">feelhomebnb</small>Le Vieux Nancéein</div>
+      <div class="property-gradient"></div>
+      <div class="property-label"><small>Feelhomebnb</small>Le Vieux Nancéien</div>
     </div>
     <div class="property wide">
       <image-slot id="prop-7" class="property-slot" shape="rect" placeholder="Loft — Craffe"></image-slot>
-      <div class="property-label" style=""><small style="">feelhomebnb</small>Chalet Premium</div>
+      <div class="property-gradient"></div>
+      <div class="property-label"><small>Feelhomebnb</small>Chalet Premium</div>
     </div>
   </div>
 
