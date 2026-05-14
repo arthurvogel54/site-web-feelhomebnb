@@ -1,797 +1,667 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Feel'HomeBnb — Conciergerie Premium à Nancy</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet"/>
-  <style>
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+<!DOCTYPE html><html lang="fr"><head>
 
-    :root{
-      --gold:#d4af37;
-      --gold-light:#f0d060;
-      --gold-dim:rgba(212,175,55,0.35);
-      --blue-deep:#0d1060;
-      --blue-royal:#1a237e;
-      --black:#05050f;
-    }
 
-    html,body{
-      width:100%;height:100%;
-      overflow-x:hidden;
-      background:var(--black);
-      font-family:'Montserrat',sans-serif;
-      color:#fff;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feel'HomeBNB Conciergerie — Nancy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&amp;family=Pinyon+Script&amp;family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<script src="image-slot.js"></script>
+<style>
+  :root {
+    --navy-0: #03081f;
+    --navy-1: #060f3a;
+    --gold-1: #b5894a;
+    --gold-2: #d8b46a;
+    --gold-3: #f3df9b;
+    --gold-4: #fff3c8;
+    --ivory: #f5efe2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; color: var(--ivory); font-family: 'Inter', sans-serif; }
+  body { overflow-x: hidden; }
 
-    /* ── LOADER ─────────────────────────────── */
-    #loader{
-      position:fixed;inset:0;
-      background:var(--black);
-      z-index:1000;
-      display:flex;align-items:center;justify-content:center;
-      flex-direction:column;gap:18px;
-      /* CSS fallback: always disappear after 4s even if JS fails */
-      animation: loaderOut 0.7s ease-in-out 3.8s forwards;
-    }
-    @keyframes loaderOut{
-      to{ opacity:0; pointer-events:none; visibility:hidden; }
-    }
-    .loader-key{
-      width:90px;height:54px;
-      opacity:0;transform:translateY(-24px);
-      animation: loaderKeyIn 0.7s ease-out 0.3s forwards;
-    }
-    @keyframes loaderKeyIn{
-      to{ opacity:1; transform:translateY(0); }
-    }
-    .loader-brand{
-      font-family:'Cormorant Garamond',serif;
-      color:var(--gold);font-size:15px;letter-spacing:5px;
-      opacity:0;
-      animation: loaderKeyIn 0.7s ease-out 0.8s forwards;
-    }
-    /* CSS fallback for content elements if GSAP never runs */
-    #logo,#hero-text,#properties,#window-arch,#scroll-hint{
-      animation: contentIn 0.9s ease-out 4.3s forwards;
-    }
-    .orn{ animation: contentIn 0.7s ease-out 4.5s forwards; }
-    @keyframes contentIn{ to{ opacity:1; } }
+  /* HERO — full-bleed background image of the navy room + window onto Place Stanislas */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background:
+      url('assets/hero-bg.jpg') center center / cover no-repeat,
+      #03081f;
+    isolation: isolate;
+  }
+  /* darken the left side a touch to anchor the text */
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 28% 45%, rgba(3,8,31,.55) 0%, rgba(3,8,31,.25) 40%, transparent 70%),
+      linear-gradient(180deg, rgba(3,8,31,.35) 0%, transparent 25%, transparent 75%, rgba(3,8,31,.4) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  /* gold halo behind key */
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 38%; top: 38%;
+    transform: translate(-50%,-50%);
+    width: 50vw; height: 50vw;
+    max-width: 700px; max-height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(216,180,106,.28) 0%, rgba(216,180,106,.12) 30%, rgba(216,180,106,0) 65%);
+    filter: blur(20px);
+    pointer-events: none;
+    z-index: 1;
+    animation: haloPulse 6s ease-in-out infinite;
+  }
+  @keyframes haloPulse {
+    0%, 100% { opacity: .9; transform: translate(-50%,-50%) scale(1); }
+    50%      { opacity: 1;  transform: translate(-50%,-50%) scale(1.06); }
+  }
 
-    /* ── HERO ────────────────────────────────── */
-    #hero{
-      position:relative;width:100%;height:100vh;min-height:680px;
-      overflow:hidden;
-    }
+  /* ornamental corners */
+  .corner {
+    position: absolute;
+    width: 150px; height: 150px;
+    z-index: 5;
+    color: var(--gold-2);
+    opacity: .85;
+    pointer-events: none;
+  }
+  .corner.tl { top: 28px; left: 28px; }
+  .corner.tr { top: 28px; right: 28px; transform: scaleX(-1); }
+  .corner.bl { bottom: 28px; left: 28px; transform: scaleY(-1); }
+  .corner.br { bottom: 28px; right: 28px; transform: scale(-1,-1); }
+  .corner svg { width: 100%; height: 100%; display: block; }
 
-    /* right-side luxury room photo — cream Haussmann interior */
-    .bg-room{
-      position:absolute;right:0;top:0;
-      width:52%;height:100%;
-      background:
-        url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=900&fit=crop&q=80') center/cover no-repeat;
-      z-index:0;
-    }
+  .nancy-mark {
+    position: absolute;
+    z-index: 5;
+    font-family: 'Pinyon Script', cursive;
+    font-size: 26px;
+    color: var(--gold-3);
+    text-shadow: 0 0 12px rgba(216,180,106,.45), 0 2px 6px rgba(0,0,0,.5);
+    letter-spacing: 1px;
+  }
+  .nancy-mark.tr { top: 46px; right: 80px; }
+  .nancy-mark.bl { bottom: 54px; left: 80px; }
 
-    /* blue wall gradient — layered for depth + luminous center glow */
-    .bg-wall{
-      position:absolute;inset:0;z-index:1;
-      background:
-        /* luminous halo where the key floats */
-        radial-gradient(ellipse 38% 42% at 46% 46%, rgba(50,70,230,0.55) 0%, transparent 65%),
-        /* royal blue core */
-        radial-gradient(ellipse 62% 70% at 42% 44%, rgba(22,34,160,0.96) 0%, rgba(10,14,80,0.98) 42%, rgba(5,5,18,1) 75%),
-        /* dark-to-blue-to-transparent horizontal spread */
-        linear-gradient(to right,
-          #05050f 0%,
-          #05050f 6%,
-          #08083a 16%,
-          #0e1270 28%,
-          #1a237e 46%,
-          rgba(20,28,120,0.80) 60%,
-          rgba(14,16,70,0.28) 73%,
-          transparent 83%
-        );
-    }
+  /* main layout */
+  .hero-grid {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 100px 80px 60px;
+    min-height: 100vh;
+    align-items: start;
+  }
 
-    /* subtle noise/texture overlay */
-    .bg-wall::after{
-      content:'';
-      position:absolute;inset:0;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      opacity:0.08;pointer-events:none;
-    }
+  /* LEFT: heading + tagline + CTA */
+  .left {
+    position: relative;
+    padding-top: 60px;
+    padding-right: 30px;
+    z-index: 4;
+  }
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 28px;
+    opacity: .9;
+  }
+  .eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 36px; height: 1px;
+    background: var(--gold-2);
+    vertical-align: middle;
+    margin-right: 14px;
+    transform: translateY(-2px);
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(38px, 4.6vw, 68px);
+    line-height: 1.02;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ivory);
+    margin-bottom: 28px;
+    text-wrap: balance;
+    text-shadow: 0 4px 30px rgba(0,0,0,.6);
+  }
+  h1 .accent {
+    background: linear-gradient(180deg, var(--gold-4) 0%, var(--gold-2) 70%, var(--gold-1) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+  .tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 21px;
+    line-height: 1.5;
+    color: rgba(245,239,226,.9);
+    max-width: 460px;
+    margin-bottom: 40px;
+    text-shadow: 0 2px 12px rgba(0,0,0,.7);
+  }
+  .cta-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 17px 30px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--navy-0);
+    background: linear-gradient(180deg, var(--gold-4) 0%, var(--gold-3) 35%, var(--gold-2) 65%, var(--gold-1) 100%);
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    box-shadow:
+      0 0 0 1px rgba(255,243,200,.4) inset,
+      0 0 30px rgba(216,180,106,.45),
+      0 12px 30px rgba(0,0,0,.5);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(255,243,200,.6) inset, 0 0 40px rgba(243,223,155,.7), 0 14px 36px rgba(0,0,0,.6); }
+  .btn-ghost {
+    color: var(--gold-3);
+    background: rgba(3,8,31,.3);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(216,180,106,.45);
+    box-shadow: none;
+    padding: 17px 28px;
+  }
+  .btn-ghost:hover { background: rgba(216,180,106,.12); transform: translateY(-1px); }
 
-    /* ── ORNAMENT CORNERS ────────────────────── */
-    .orn{
-      position:absolute;width:70px;height:70px;z-index:20;opacity:0;
-    }
-    .orn-tl{top:14px;left:14px}
-    .orn-tr{top:14px;right:14px}
-    .orn-bl{bottom:162px;left:14px}
-    .orn-br{bottom:162px;right:14px}
-    .orn-label{
-      font-family:'Cormorant Garamond',serif;font-style:italic;
-      color:var(--gold);font-size:10px;letter-spacing:2px;opacity:.7;
-      position:absolute;white-space:nowrap;
-    }
-    .orn-tl .orn-label,.orn-bl .orn-label{left:0}
-    .orn-tr .orn-label,.orn-br .orn-label{right:0}
-    .orn-tl .orn-label,.orn-tr .orn-label{bottom:-16px}
-    .orn-bl .orn-label,.orn-br .orn-label{top:-16px}
+  /* CENTER STAGE — brand logo */
+  .center-stage {
+    position: absolute;
+    left: 50%; top: 12px;
+    transform: translateX(-50%);
+    z-index: 6;
+    text-align: center;
+    pointer-events: none;
+    width: min(280px, 22vw);
+  }
+  .brand-logo {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter:
+      drop-shadow(0 6px 28px rgba(0,0,0,.55))
+      drop-shadow(0 0 30px rgba(216,180,106,.35));
+    animation: logoFloat 5s ease-in-out infinite;
+  }
+  @keyframes logoFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  .brand-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: clamp(28px, 2.8vw, 44px);
+    letter-spacing: 6px;
+    background: linear-gradient(180deg, var(--gold-4) 0%, var(--gold-2) 60%, var(--gold-1) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 30px rgba(216,180,106,.3);
+    margin-bottom: 4px;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,.5));
+  }
+  .brand-script {
+    font-family: 'Pinyon Script', cursive;
+    font-size: clamp(34px, 3.2vw, 54px);
+    background: linear-gradient(180deg, var(--gold-4) 0%, var(--gold-2) 60%, var(--gold-1) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+    line-height: 1;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,.5));
+  }
+  .brand-rule {
+    display: block;
+    width: 60px; height: 1px;
+    margin: 14px auto 0;
+    background: linear-gradient(90deg, transparent, var(--gold-2), transparent);
+  }
 
-    /* ── LOGO ────────────────────────────────── */
-    #logo{
-      position:absolute;top:28px;left:50%;transform:translateX(-50%);
-      text-align:center;z-index:15;opacity:0;white-space:nowrap;
-    }
-    .logo-svg{width:130px;height:46px;display:block;margin:0 auto 6px}
-    .brand-name{
-      font-family:'Cormorant Garamond',serif;font-weight:600;
-      font-size:clamp(26px,3.2vw,42px);color:var(--gold);
-      letter-spacing:6px;line-height:1;
-      text-shadow:0 0 40px rgba(212,175,55,0.45);
-    }
-    .brand-sub{
-      font-family:'Great Vibes',cursive;
-      color:var(--gold);font-size:clamp(16px,1.9vw,24px);
-      opacity:.9;display:block;margin-top:2px;
-    }
+  /* 3D KEY */
+  .key-stage {
+    position: relative;
+    width: 110%;
+    margin-left: -5%;
+    height: 280px;
+    margin-top: 32px;
+    perspective: 1400px;
+    perspective-origin: 50% 40%;
+  }
+  .key-3d {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 440px; height: 130px;
+    transform-style: preserve-3d;
+    transform: translate(-50%, -50%) rotateZ(22deg);
+    animation: keyFloat 7s ease-in-out infinite;
+    filter: drop-shadow(0 30px 40px rgba(0,0,0,.55)) drop-shadow(0 0 30px rgba(243,223,155,.4));
+  }
+  @keyframes keyFloat {
+    0%   { transform: translate(-50%, -50%) rotateZ(22deg) rotateY(-10deg) translateY(0); }
+    50%  { transform: translate(-50%, -50%) rotateZ(22deg) rotateY(14deg)  translateY(-14px); }
+    100% { transform: translate(-50%, -50%) rotateZ(22deg) rotateY(-10deg) translateY(0); }
+  }
+  .key-3d svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
-    /* ── THREE.JS CANVAS ─────────────────────── */
-    #key-canvas{
-      position:absolute;inset:0;
-      width:100%;height:100%;
-      z-index:10;pointer-events:none;
-    }
+  /* shimmer trail */
+  .trail {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-95%, -10%) rotate(-14deg);
+    width: 520px; height: 120px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .trail svg { width: 100%; height: 100%; overflow: visible; }
+  .trail .spark {
+    fill: var(--gold-3);
+    filter: drop-shadow(0 0 6px var(--gold-4));
+    animation: sparkle 3s ease-in-out infinite;
+  }
+  @keyframes sparkle {
+    0%, 100% { opacity: .35; transform: translateY(0); }
+    50%      { opacity: 1;   transform: translateY(-2px); }
+  }
 
-    /* ── HERO TEXT (LEFT) ────────────────────── */
-    #hero-text{
-      position:absolute;
-      left:clamp(18px,4vw,58px);
-      bottom:clamp(190px,22vh,230px);
-      z-index:15;max-width:380px;opacity:0;
-    }
-    .text-bar{
-      width:36px;height:1px;
-      background:var(--gold);opacity:.55;margin-bottom:18px;
-    }
-    .hero-title{
-      font-family:'Cormorant Garamond',serif;font-weight:700;
-      font-size:clamp(24px,3.3vw,50px);
-      color:var(--gold);line-height:1.1;
-      letter-spacing:2px;text-transform:uppercase;
-      margin-bottom:18px;
-      text-shadow:0 2px 24px rgba(0,0,0,.6);
-    }
-    .hero-body{
-      font-family:'Montserrat',sans-serif;font-weight:300;
-      font-size:clamp(12px,1.15vw,15px);
-      color:rgba(255,255,255,.82);line-height:1.8;letter-spacing:.4px;
-    }
+  /* CONTENT BELOW HERO (lives over a darker variant of the same bg) */
+  .section-dark {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(3,8,31,.92) 0%, rgba(3,8,31,.97) 100%),
+      url('assets/hero-bg.jpg') center center / cover no-repeat fixed;
+    padding: 100px 80px 60px;
+  }
 
-    /* ── ARCHED WINDOW ───────────────────────── */
-    #window-arch{
-      position:absolute;
-      right:clamp(8px,2.5vw,32px);
-      top:clamp(16px,3vh,36px);
-      width:clamp(220px,28vw,400px);
-      z-index:8;opacity:0;
-    }
-    .win-outer{
-      position:relative;
-      padding-top:130%;
-      background:#e8ddc8;
-      border-radius:50% 50% 4px 4px / 18% 18% 0 0;
-      box-shadow:
-        0 40px 100px rgba(0,0,0,.65),
-        0 0 0 2px rgba(212,175,55,0.15),
-        inset 0 0 0 11px #fff,
-        inset 0 0 0 14px #d6cba8;
-    }
-    .win-view{
-      position:absolute;
-      inset:13px;
-      border-radius:calc(50% - 8px) calc(50% - 8px) 2px 2px / calc(18% - 4px) calc(18% - 4px) 0 0;
-      overflow:hidden;
-      background:
-        url('https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Nancy_place_Stanislas_grilles.jpg&width=800') center 30%/cover no-repeat,
-        url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Nancy_Stanislas_1.jpg/1280px-Nancy_Stanislas_1.jpg') center/cover no-repeat,
-        linear-gradient(160deg,#f9c75b 0%,#e8a830 40%,#c47820 80%,#7a4010 100%);
-    }
-    /* window mullions */
-    .mull-v,.mull-h,.mull-h2{position:absolute;background:#ede3ce;z-index:3}
-    .mull-v{left:50%;top:0;bottom:0;width:11px;transform:translateX(-50%)}
-    .mull-h{top:48%;left:0;right:0;height:11px;transform:translateY(-50%)}
-    .mull-h2{top:73%;left:0;right:0;height:9px}
-    /* arch top horizontal bar */
-    .mull-arc{
-      position:absolute;top:35%;left:0;right:0;height:9px;
-      background:#ede3ce;z-index:3;
-    }
+  /* property gallery */
+  .gallery {
+    max-width: 1500px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 22px;
+  }
+  .gallery-head { grid-column: 1 / -1; text-align: center; margin-bottom: 30px; }
+  .property { grid-column: span 3; }
+  .property.wide { grid-column: span 4; }
+  .gallery-head .eyebrow { display: block; margin-bottom: 16px; }
+  .gallery-head h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 3.5vw, 52px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ivory);
+  }
+  .gallery-head h2 .accent {
+    font-family: 'Pinyon Script', cursive;
+    font-size: 1.2em;
+    text-transform: none;
+    letter-spacing: 0;
+    background: linear-gradient(180deg, var(--gold-4) 0%, var(--gold-2) 70%, var(--gold-1) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+  .property {
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(216,180,106,.35);
+    box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .property:hover { transform: translateY(-4px); box-shadow: 0 30px 60px rgba(0,0,0,.7), 0 0 0 1px rgba(243,223,155,.4); }
+  .property-slot { width: 100%; height: 100%; display: block; }
+  .property-label {
+    position: absolute;
+    left: 14px; bottom: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--ivory);
+    text-shadow: 0 2px 8px rgba(0,0,0,.8);
+    z-index: 2;
+  }
+  .property-label small {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 2px;
+  }
 
-    /* ── PROPERTIES BAR ──────────────────────── */
-    #properties{
-      position:absolute;bottom:0;left:0;right:0;
-      height:170px;
-      padding:16px 28px;
-      background:linear-gradient(to top,rgba(5,5,15,.96) 0%,rgba(5,5,15,.75) 55%,transparent 100%);
-      display:flex;gap:14px;align-items:flex-end;
-      z-index:20;opacity:0;
-    }
-    .prop-card{
-      flex:1;height:130px;min-width:0;
-      border-radius:13px;overflow:hidden;
-      position:relative;cursor:pointer;
-      border:1px solid var(--gold-dim);
-      transition:border-color .3s,transform .3s;
-    }
-    .prop-card:hover{
-      border-color:var(--gold);
-      transform:translateY(-4px);
-    }
-    .prop-card img{
-      width:100%;height:100%;object-fit:cover;
-      display:block;transition:transform .45s ease;
-    }
-    .prop-card:hover img{transform:scale(1.07)}
-    .prop-overlay{
-      position:absolute;inset:0;
-      background:rgba(8,8,28,.78);
-      border:2px solid var(--gold);
-      border-radius:12px;
-      display:flex;align-items:center;justify-content:center;
-      opacity:0;transition:opacity .3s ease;
-    }
-    .prop-card:hover .prop-overlay{opacity:1}
-    .prop-overlay span{
-      font-family:'Cormorant Garamond',serif;
-      color:var(--gold);font-size:14px;letter-spacing:1px;font-weight:600;
-      text-align:center;padding:0 8px;
-    }
+  /* PILLARS */
+  .pillars {
+    max-width: 1300px;
+    margin: 100px auto 0;
+    padding-top: 60px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+    border-top: 1px solid rgba(216,180,106,.18);
+  }
+  .pillar { text-align: center; }
+  .pillar-icon {
+    width: 44px; height: 44px;
+    margin: 0 auto 22px;
+    color: var(--gold-2);
+  }
+  .pillar h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 14px;
+  }
+  .pillar p {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.55;
+    color: rgba(245,239,226,.75);
+  }
 
-    /* ── SCROLL HINT ─────────────────────────── */
-    #scroll-hint{
-      position:absolute;bottom:180px;right:26px;
-      z-index:20;display:flex;flex-direction:column;
-      align-items:center;gap:5px;opacity:0;
-    }
-    #scroll-hint span{
-      font-size:9px;letter-spacing:3px;
-      color:rgba(212,175,55,.55);
-      writing-mode:vertical-rl;text-transform:uppercase;
-    }
-    .scroll-line{
-      width:1px;height:38px;
-      background:linear-gradient(to bottom,var(--gold),transparent);
-    }
+  /* FINAL CTA */
+  .final-cta {
+    margin: 120px auto 0;
+    max-width: 800px;
+    text-align: center;
+    padding: 60px 40px;
+    border: 1px solid rgba(216,180,106,.3);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(216,180,106,.06), rgba(216,180,106,.02));
+    backdrop-filter: blur(4px);
+  }
+  .final-cta h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 32px;
+    color: var(--ivory);
+    margin-bottom: 14px;
+  }
+  .final-cta p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    color: rgba(245,239,226,.7);
+    margin-bottom: 36px;
+  }
 
-    /* ── RESPONSIVE ──────────────────────────── */
-    @media(max-width:900px){
-      #window-arch{width:clamp(160px,22vw,240px)}
-      #hero-text{max-width:300px;bottom:188px}
-    }
-    @media(max-width:640px){
-      #window-arch{display:none}
-      .bg-room{width:100%}
-      .bg-wall{background:
-        radial-gradient(ellipse 80% 70% at 50% 45%,rgba(18,24,130,.9) 0%,rgba(5,5,20,.97) 70%),
-        linear-gradient(to bottom,#05050f 0%,rgba(5,5,15,.6) 100%)}
-      #hero-text{left:16px;bottom:185px;max-width:260px}
-      .hero-title{font-size:22px}
-      #properties{overflow-x:auto;overflow-y:visible;scrollbar-width:none;padding:14px 16px;gap:10px}
-      #properties::-webkit-scrollbar{display:none}
-      .prop-card{min-width:150px;height:116px}
-      .orn{width:48px;height:48px}
-      #scroll-hint{display:none}
-    }
-    @media(max-width:380px){
-      .brand-name{font-size:20px;letter-spacing:3px}
-      #hero-text{max-width:210px}
-    }
-  </style>
+  /* footer */
+  footer {
+    text-align: center;
+    padding: 50px 80px 40px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(216,180,106,.5);
+    background: #03081f;
+  }
+
+  @media (max-width: 1100px) {
+    .hero-grid { grid-template-columns: 1fr; padding: 70px 28px 40px; }
+    .left { padding-right: 0; padding-top: 0; }
+    .center-stage { position: relative; left: auto; top: auto; transform: none; margin: 40px auto 30px; width: 100%; }
+    .section-dark { padding: 80px 28px 40px; }
+    .gallery { grid-template-columns: repeat(2,1fr); }
+    .property, .property.wide { grid-column: span 1; }
+    .pillars { grid-template-columns: 1fr; gap: 40px; }
+    .corner { width: 90px; height: 90px; }
+  }
+</style>
 </head>
-<body>
+<body style="">
 
-<!-- ════════════════════════════════════════
-     LOADER
-════════════════════════════════════════ -->
-<div id="loader">
-  <svg class="loader-key" viewBox="0 0 100 56" fill="none">
-    <circle cx="22" cy="22" r="9" stroke="#d4af37" stroke-width="2.8"/>
-    <circle cx="38" cy="22" r="9" stroke="#d4af37" stroke-width="2.8"/>
-    <circle cx="22" cy="38" r="9" stroke="#d4af37" stroke-width="2.8"/>
-    <circle cx="38" cy="38" r="9" stroke="#d4af37" stroke-width="2.8"/>
-    <rect x="43" y="27" width="50" height="6" rx="3" fill="#d4af37"/>
-    <rect x="76" y="33" width="6" height="11" rx="1.5" fill="#d4af37"/>
-    <rect x="86" y="33" width="5" height="8" rx="1.5" fill="#d4af37"/>
-  </svg>
-  <p class="loader-brand">FEEL'HOMEBNB</p>
-</div>
+<!-- ========== HERO ========== -->
+<section class="hero">
 
-<!-- ════════════════════════════════════════
-     HERO
-════════════════════════════════════════ -->
-<section id="hero">
-
-  <!-- backgrounds -->
-  <div class="bg-room"></div>
-  <div class="bg-wall"></div>
-
-  <!-- corner ornaments -->
-  <div class="orn orn-tl">
-    <svg viewBox="0 0 70 70" fill="none">
-      <path d="M2 2L28 2" stroke="#d4af37" stroke-width="1.5"/>
-      <path d="M2 2L2 28" stroke="#d4af37" stroke-width="1.5"/>
-      <circle cx="2" cy="2" r="2.5" fill="#d4af37"/>
-      <path d="M9 2L9 9L2 9" stroke="#d4af37" stroke-width=".9" opacity=".45"/>
-      <circle cx="15" cy="2" r="1" fill="#d4af37" opacity=".4"/>
-      <circle cx="2" cy="15" r="1" fill="#d4af37" opacity=".4"/>
+  <!-- Ornamental corners -->
+  <div class="corner tl" aria-hidden="true">
+    <svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.2">
+      <path d="M10 60 Q10 10 60 10"></path>
+      <path d="M14 70 Q14 14 70 14" opacity=".6"></path>
+      <circle cx="30" cy="30" r="3" fill="currentColor" stroke="none"></circle>
+      <path d="M30 30 Q60 35 80 14 M30 30 Q35 60 14 80"></path>
+      <path d="M50 18 Q70 30 70 50" opacity=".7"></path>
+      <path d="M18 50 Q30 70 50 70" opacity=".7"></path>
+      <circle cx="60" cy="60" r="2" fill="currentColor" stroke="none"></circle>
+      <path d="M70 50 Q90 50 100 30" opacity=".5"></path>
+      <path d="M50 70 Q50 90 30 100" opacity=".5"></path>
     </svg>
-    <span class="orn-label">Nancy</span>
   </div>
-  <div class="orn orn-tr">
-    <svg viewBox="0 0 70 70" fill="none">
-      <path d="M68 2L42 2" stroke="#d4af37" stroke-width="1.5"/>
-      <path d="M68 2L68 28" stroke="#d4af37" stroke-width="1.5"/>
-      <circle cx="68" cy="2" r="2.5" fill="#d4af37"/>
-      <path d="M61 2L61 9L68 9" stroke="#d4af37" stroke-width=".9" opacity=".45"/>
-      <circle cx="55" cy="2" r="1" fill="#d4af37" opacity=".4"/>
-      <circle cx="68" cy="15" r="1" fill="#d4af37" opacity=".4"/>
+  <div class="corner tr" aria-hidden="true">
+    <svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.2">
+      <path d="M10 60 Q10 10 60 10"></path>
+      <path d="M14 70 Q14 14 70 14" opacity=".6"></path>
+      <circle cx="30" cy="30" r="3" fill="currentColor" stroke="none"></circle>
+      <path d="M30 30 Q60 35 80 14 M30 30 Q35 60 14 80"></path>
+      <path d="M50 18 Q70 30 70 50" opacity=".7"></path>
+      <path d="M18 50 Q30 70 50 70" opacity=".7"></path>
+      <circle cx="60" cy="60" r="2" fill="currentColor" stroke="none"></circle>
     </svg>
-    <span class="orn-label">Nancy</span>
   </div>
-  <div class="orn orn-bl">
-    <svg viewBox="0 0 70 70" fill="none">
-      <path d="M2 68L28 68" stroke="#d4af37" stroke-width="1.5"/>
-      <path d="M2 68L2 42" stroke="#d4af37" stroke-width="1.5"/>
-      <circle cx="2" cy="68" r="2.5" fill="#d4af37"/>
-      <path d="M9 68L9 61L2 61" stroke="#d4af37" stroke-width=".9" opacity=".45"/>
-      <path d="M35 48L42 56L35 64L28 56Z" fill="#d4af37" opacity=".55"/>
-      <path d="M30 43L35 36L40 43L35 50Z" fill="none" stroke="#d4af37" stroke-width="1" opacity=".4"/>
+  <div class="corner bl" aria-hidden="true">
+    <svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.2">
+      <path d="M10 60 Q10 10 60 10"></path>
+      <path d="M14 70 Q14 14 70 14" opacity=".6"></path>
+      <circle cx="30" cy="30" r="3" fill="currentColor" stroke="none"></circle>
+      <path d="M30 30 Q60 35 80 14 M30 30 Q35 60 14 80"></path>
+      <path d="M50 18 Q70 30 70 50" opacity=".7"></path>
+      <path d="M18 50 Q30 70 50 70" opacity=".7"></path>
+      <circle cx="60" cy="60" r="2" fill="currentColor" stroke="none"></circle>
     </svg>
-    <span class="orn-label">Nancy</span>
   </div>
-  <div class="orn orn-br">
-    <svg viewBox="0 0 70 70" fill="none">
-      <path d="M68 68L42 68" stroke="#d4af37" stroke-width="1.5"/>
-      <path d="M68 68L68 42" stroke="#d4af37" stroke-width="1.5"/>
-      <circle cx="68" cy="68" r="2.5" fill="#d4af37"/>
-      <path d="M61 68L61 61L68 61" stroke="#d4af37" stroke-width=".9" opacity=".45"/>
-      <path d="M35 48L42 56L35 64L28 56Z" fill="#d4af37" opacity=".55"/>
-      <path d="M30 43L35 36L40 43L35 50Z" fill="none" stroke="#d4af37" stroke-width="1" opacity=".4"/>
-    </svg>
-    <span class="orn-label">Nancy</span>
-  </div>
+  <span class="nancy-mark tr">Nancy</span>
+  <span class="nancy-mark bl">Nancy</span>
 
-  <!-- logo -->
-  <div id="logo">
-    <svg class="logo-svg" viewBox="0 0 140 46" fill="none">
-      <!-- bow: 4 overlapping rings -->
-      <circle cx="47" cy="16" r="8" fill="none" stroke="#d4af37" stroke-width="2.6"/>
-      <circle cx="60" cy="16" r="8" fill="none" stroke="#d4af37" stroke-width="2.6"/>
-      <circle cx="47" cy="29" r="8" fill="none" stroke="#d4af37" stroke-width="2.6"/>
-      <circle cx="60" cy="29" r="8" fill="none" stroke="#d4af37" stroke-width="2.6"/>
-      <!-- shaft -->
-      <rect x="65" y="19" width="62" height="6" rx="3" fill="#d4af37"/>
-      <!-- teeth -->
-      <rect x="107" y="25" width="6" height="11" rx="1.5" fill="#d4af37"/>
-      <rect x="117" y="25" width="5" height="9" rx="1.5" fill="#d4af37"/>
-      <rect x="125" y="25" width="4" height="7" rx="1" fill="#d4af37"/>
-      <!-- tip cap -->
-      <rect x="125" y="19" width="10" height="6" rx="1" fill="#d4af37"/>
-      <!-- decorative flanking lines -->
-      <line x1="4" y1="22" x2="38" y2="22" stroke="#d4af37" stroke-width=".8" opacity=".35"/>
-      <circle cx="2" cy="22" r="1.5" fill="#d4af37" opacity=".4"/>
-    </svg>
-    <h1 class="brand-name">FEEL'HOMEBNB</h1>
-    <span class="brand-sub">Conciergerie</span>
-  </div>
+  <div class="hero-grid">
+    <div class="left">
+      <div class="eyebrow">Conciergerie Premium · Nancy</div>
+      <h1>Votre parenthèse<br><span class="accent">d'exception</span><br>à Nancy</h1>
+      <p class="tagline">Une conciergerie premium pour des séjours inoubliables au cœur de la cité ducale.</p>
+      <div class="cta-row">
+        <a href="#" class="btn">Réserver sur Airbnb</a>
+        <a href="#biens" class="btn btn-ghost">Découvrir nos biens</a>
+      </div>
+    </div>
 
-  <!-- Three.js WebGL canvas (3D key + particles) -->
-  <canvas id="key-canvas"></canvas>
+    <!-- Brand logo (centered absolute) -->
+    <div class="center-stage" aria-hidden="false">
+      <img src="assets/logo.png" alt="Feel'HomeBNB Conciergerie" class="brand-logo">
 
-  <!-- left text block -->
-  <div id="hero-text">
-    <div class="text-bar"></div>
-    <h2 class="hero-title">VOTRE PARENTHÈSE<br>D'EXCEPTION<br>À NANCY</h2>
-    <p class="hero-body">
-      Une conciergerie premium<br>
-      pour des séjours inoubliables.
-    </p>
-  </div>
+      <div class="key-stage" hidden="">
+        <div class="trail" aria-hidden="true">
+          <svg viewBox="0 0 520 120" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="trailGrad" x1="0" x2="1">
+                <stop offset="0%" stop-color="#f3df9b" stop-opacity="0"></stop>
+                <stop offset="40%" stop-color="#f3df9b" stop-opacity=".7"></stop>
+                <stop offset="100%" stop-color="#f3df9b" stop-opacity="0"></stop>
+              </linearGradient>
+            </defs>
+            <path d="M10 80 Q150 30 280 60 T510 50" stroke="url(#trailGrad)" stroke-width="1.5" fill="none"></path>
+            <path d="M10 90 Q150 50 280 75 T510 70" stroke="url(#trailGrad)" stroke-width="1" fill="none" opacity=".6"></path>
+            <circle class="spark" cx="60" cy="78" r="1.6" style="animation-delay: 0s"></circle>
+            <circle class="spark" cx="140" cy="55" r="1.2" style="animation-delay: .3s"></circle>
+            <circle class="spark" cx="210" cy="62" r="2" style="animation-delay: .6s"></circle>
+            <circle class="spark" cx="280" cy="58" r="1.4" style="animation-delay: .9s"></circle>
+            <circle class="spark" cx="360" cy="55" r="1.8" style="animation-delay: 1.2s"></circle>
+            <circle class="spark" cx="430" cy="52" r="1.2" style="animation-delay: 1.5s"></circle>
+            <circle class="spark" cx="490" cy="60" r="1.6" style="animation-delay: 1.8s"></circle>
+            <circle class="spark" cx="100" cy="90" r="1" style="animation-delay: .4s"></circle>
+            <circle class="spark" cx="240" cy="82" r="1.4" style="animation-delay: 1.1s"></circle>
+            <circle class="spark" cx="380" cy="75" r="1.2" style="animation-delay: 1.6s"></circle>
+          </svg>
+        </div>
 
-  <!-- right arched window -->
-  <div id="window-arch">
-    <div class="win-outer">
-      <div class="win-view">
-        <div class="mull-v"></div>
-        <div class="mull-h"></div>
-        <div class="mull-arc"></div>
-        <div class="mull-h2"></div>
+        <div class="key-3d" aria-hidden="true">
+          <svg viewBox="0 0 460 130">
+            <defs>
+              <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fff3c8"></stop>
+                <stop offset="35%" stop-color="#f3df9b"></stop>
+                <stop offset="55%" stop-color="#d8b46a"></stop>
+                <stop offset="80%" stop-color="#a37535"></stop>
+                <stop offset="100%" stop-color="#6b4818"></stop>
+              </linearGradient>
+              <linearGradient id="goldHi" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fff8d8"></stop>
+                <stop offset="100%" stop-color="#f3df9b" stop-opacity="0"></stop>
+              </linearGradient>
+              <radialGradient id="bowGrad" cx="40%" cy="35%" r="70%">
+                <stop offset="0%" stop-color="#fff8d8"></stop>
+                <stop offset="30%" stop-color="#f3df9b"></stop>
+                <stop offset="60%" stop-color="#c9994f"></stop>
+                <stop offset="100%" stop-color="#6b4818"></stop>
+              </radialGradient>
+            </defs>
+
+            <!-- BOW: quatrefoil -->
+            <g transform="translate(85,65)">
+              <circle cx="0" cy="-32" r="22" fill="url(#bowGrad)" stroke="#8a5e1f" stroke-width="1.2"></circle>
+              <circle cx="32" cy="0" r="22" fill="url(#bowGrad)" stroke="#8a5e1f" stroke-width="1.2"></circle>
+              <circle cx="0" cy="32" r="22" fill="url(#bowGrad)" stroke="#8a5e1f" stroke-width="1.2"></circle>
+              <circle cx="-32" cy="0" r="22" fill="url(#bowGrad)" stroke="#8a5e1f" stroke-width="1.2"></circle>
+              <circle cx="0" cy="0" r="14" fill="url(#bowGrad)" stroke="#8a5e1f" stroke-width="1.2"></circle>
+              <circle cx="0" cy="0" r="6" fill="#3a2510"></circle>
+              <ellipse cx="-6" cy="-38" rx="8" ry="4" fill="url(#goldHi)" opacity=".9"></ellipse>
+              <ellipse cx="26" cy="-6" rx="8" ry="4" fill="url(#goldHi)" opacity=".9"></ellipse>
+              <ellipse cx="-38" cy="-6" rx="8" ry="4" fill="url(#goldHi)" opacity=".9"></ellipse>
+              <ellipse cx="-6" cy="26" rx="8" ry="4" fill="url(#goldHi)" opacity=".7"></ellipse>
+            </g>
+
+            <!-- Collar -->
+            <rect x="138" y="55" width="12" height="20" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+            <rect x="135" y="52" width="18" height="6" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+            <rect x="135" y="72" width="18" height="6" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+
+            <!-- Shaft -->
+            <rect x="150" y="58" width="220" height="14" rx="2" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+            <rect x="152" y="60" width="216" height="3" fill="url(#goldHi)" opacity=".8"></rect>
+
+            <!-- Bead -->
+            <circle cx="240" cy="65" r="10" fill="url(#bowGrad)" stroke="#8a5e1f" stroke-width="1"></circle>
+            <circle cx="240" cy="65" r="4" fill="#3a2510"></circle>
+
+            <!-- Teeth -->
+            <rect x="370" y="50" width="14" height="30" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+            <rect x="384" y="58" width="20" height="14" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+            <rect x="404" y="50" width="14" height="30" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+            <rect x="418" y="58" width="22" height="14" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+            <rect x="440" y="55" width="8" height="20" fill="url(#gold)" stroke="#8a5e1f" stroke-width="1"></rect>
+            <rect x="372" y="52" width="10" height="3" fill="url(#goldHi)" opacity=".8"></rect>
+            <rect x="406" y="52" width="10" height="3" fill="url(#goldHi)" opacity=".8"></rect>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- properties grid -->
-  <div id="properties">
-    <div class="prop-card" onclick="window.open('https://www.airbnb.fr','_blank')">
-      <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=420&h=280&fit=crop&q=80" alt="Appartement 1 – Salon lumineux"/>
-      <div class="prop-overlay"><span>Réserver sur Airbnb</span></div>
-    </div>
-    <div class="prop-card" onclick="window.open('https://www.airbnb.fr','_blank')">
-      <img src="https://images.unsplash.com/photo-1554995207-c18c203602cb?w=420&h=280&fit=crop&q=80" alt="Appartement 2 – Intérieur moderne"/>
-      <div class="prop-overlay"><span>Réserver sur Airbnb</span></div>
-    </div>
-    <div class="prop-card" onclick="window.open('https://www.airbnb.fr','_blank')">
-      <img src="https://images.unsplash.com/photo-1586023491-72c87ef67c13?w=420&h=280&fit=crop&q=80" alt="Appartement 3 – Salon élégant"/>
-      <div class="prop-overlay"><span>Réserver sur Airbnb</span></div>
-    </div>
-    <div class="prop-card" onclick="window.open('https://www.airbnb.fr','_blank')">
-      <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=420&h=280&fit=crop&q=80" alt="Appartement 4 – Salle à manger"/>
-      <div class="prop-overlay"><span>Réserver sur Airbnb</span></div>
-    </div>
-    <div class="prop-card" onclick="window.open('https://www.airbnb.fr','_blank')">
-      <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=420&h=280&fit=crop&q=80" alt="Appartement 5 – Chambre"/>
-      <div class="prop-overlay"><span>Réserver sur Airbnb</span></div>
-    </div>
-  </div>
-
-  <!-- scroll hint -->
-  <div id="scroll-hint">
-    <span>Découvrir</span>
-    <div class="scroll-line"></div>
-  </div>
-
 </section>
 
-<!-- ════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script>
-(function(){
-'use strict';
-if(typeof gsap==='undefined'){ console.error('GSAP not loaded'); return; }
-gsap.registerPlugin(ScrollTrigger);
+<!-- ========== GALLERY ========== -->
+<section class="section-dark" id="biens">
+  <div class="gallery">
+    <div class="gallery-head">
+      <div class="eyebrow">Nos adresses</div>
+      <h2>Des biens <span class="accent">d'exception</span></h2>
+    </div>
+    <div class="property">
+      <image-slot id="prop-1" class="property-slot" shape="rect" placeholder="Salon — Appartement Stanislas"></image-slot>
+      <div class="property-label" style=""><small style="">Feelhomebnb</small>Studio Proche Centre</div>
+    </div>
+    <div class="property">
+      <image-slot id="prop-2" class="property-slot" shape="rect" placeholder="Salon — Vieille Ville"></image-slot>
+      <div class="property-label" style=""><small style="">Feelhomebnb</small>Havre de Paix</div>
+    </div>
+    <div class="property">
+      <image-slot id="prop-3" class="property-slot" shape="rect" placeholder="Salle à manger — Carrière"></image-slot>
+      <div class="property-label" style=""><small style="">Feelhomebnb</small>Nid des Vosges</div>
+    </div>
+    <div class="property">
+      <image-slot id="prop-4" class="property-slot" shape="rect" placeholder="Chambre — Suite Art Nouveau"></image-slot>
+      <div class="property-label" style=""><small style="">Feelhomebnb</small>Le Petit Stanislas</div>
+    </div>
+    <div class="property wide">
+      <image-slot id="prop-5" class="property-slot" shape="rect" placeholder="Salon — Saint-Épvre"></image-slot>
+      <div class="property-label" style=""><small style="">Feelhomebnb</small>Le Petit Cocon</div>
+    </div>
+    <div class="property wide">
+      <image-slot id="prop-6" class="property-slot" shape="rect" placeholder="Chambre — Pépinière"></image-slot>
+      <div class="property-label" style=""><small style="">feelhomebnb</small>Le Vieux Nancéein</div>
+    </div>
+    <div class="property wide">
+      <image-slot id="prop-7" class="property-slot" shape="rect" placeholder="Loft — Craffe"></image-slot>
+      <div class="property-label" style=""><small style="">feelhomebnb</small>Chalet Premium</div>
+    </div>
+  </div>
 
-/* ── Shared mutable state (declared first so try/catch can assign) ── */
-let keyGroup=null, particles=null, pGeo=null, pMat=null;
-let introComplete=false, keyBaseY=0;
-let parallaxX=0, parallaxY=0, mouseX=0, mouseY=0, pTime=0;
-const PC=160;
+  <!-- Pillars -->
+  <div class="pillars">
+    <div class="pillar">
+      <svg class="pillar-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
+        <circle cx="24" cy="24" r="20"></circle>
+        <circle cx="24" cy="24" r="14"></circle>
+        <circle cx="24" cy="24" r="2" fill="currentColor"></circle>
+      </svg>
+      <h3>Sélection rare</h3>
+      <p>Chaque adresse est choisie pour son caractère, son emplacement et son raffinement.</p>
+    </div>
+    <div class="pillar">
+      <svg class="pillar-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="8" y="8" width="32" height="32"></rect>
+        <rect x="14" y="14" width="20" height="20"></rect>
+        <circle cx="24" cy="24" r="2" fill="currentColor"></circle>
+      </svg>
+      <h3>Service sur mesure</h3>
+      <p>Accueil personnalisé, conciergerie 24/7, expériences locales orchestrées avec soin.</p>
+    </div>
+    <div class="pillar">
+      <svg class="pillar-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
+        <path d="M24 6 L42 24 L24 42 L6 24 Z"></path>
+        <path d="M24 14 L34 24 L24 34 L14 24 Z"></path>
+        <circle cx="24" cy="24" r="2" fill="currentColor"></circle>
+      </svg>
+      <h3>Esprit Nancy</h3>
+      <p>De la Place Stanislas aux jardins de la Pépinière — l'âme de la ville, sublimée.</p>
+    </div>
+  </div>
 
-/* ══════════════════════════════════════════
-   THREE.JS — isolated so any GL error won't
-   break GSAP or the rest of the page
-══════════════════════════════════════════ */
-try {
-const canvas  = document.getElementById('key-canvas');
-const W = window.innerWidth, H = window.innerHeight;
+  <div class="final-cta">
+    <h3>Prêt à vivre votre parenthèse ?</h3>
+    <p>Réservez votre séjour d'exception en quelques clics.</p>
+    <a href="#" class="btn">Réserver sur Airbnb</a>
+  </div>
+</section>
 
-const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(W, H);
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.3;
+<footer>Feel'HomeBNB · Conciergerie Premium · Nancy · © 2026</footer>
 
-const scene  = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, W/H, 0.1, 100);
-camera.position.set(0, 0, 6);
 
-/* Lighting — 3-point setup matching the concept art */
-scene.add(new THREE.AmbientLight(0xfff8e0, 0.35));
 
-// Key light: strong warm-white from top-left (creates the bright highlight on key top)
-const keyLight = new THREE.DirectionalLight(0xfff8d0, 3.0);
-keyLight.position.set(-3, 6, 5);
-scene.add(keyLight);
-
-// Fill light: golden from bottom-right (warm bounce light)
-const fill = new THREE.DirectionalLight(0xd4920a, 1.8);
-fill.position.set(5, -3, 3);
-scene.add(fill);
-
-// Rim light: from behind-right (creates edge glow)
-const rim = new THREE.DirectionalLight(0xffe8a0, 2.0);
-rim.position.set(4, 2, -3);
-scene.add(rim);
-
-// Point light: close to key for sparkle
-const pt1 = new THREE.PointLight(0xffd060, 3.5, 10);
-pt1.position.set(0.5, 2, 4);
-scene.add(pt1);
-
-/* Environment map — rich gold+blue sky for metallic reflections */
-(function buildEnv(){
-  const ec = document.createElement('canvas');
-  ec.width = 1024; ec.height = 512;
-  const ctx = ec.getContext('2d');
-
-  // Sky gradient (top): deep blue → warm horizon
-  const sky = ctx.createLinearGradient(0,0,0,256);
-  sky.addColorStop(0,   '#080830');
-  sky.addColorStop(0.4, '#1a237e');
-  sky.addColorStop(0.7, '#2a3090');
-  sky.addColorStop(1,   '#4a3020');
-  ctx.fillStyle = sky; ctx.fillRect(0,0,1024,256);
-
-  // Ground gradient (bottom): warm gold floor reflection
-  const gnd = ctx.createLinearGradient(0,256,0,512);
-  gnd.addColorStop(0,   '#7a5010');
-  gnd.addColorStop(0.4, '#c8900a');
-  gnd.addColorStop(0.8, '#e8b020');
-  gnd.addColorStop(1,   '#f0d040');
-  ctx.fillStyle = gnd; ctx.fillRect(0,256,1024,256);
-
-  // Bright window light spot (top-left) — main specular source
-  const spot = ctx.createRadialGradient(200,100,0,200,100,150);
-  spot.addColorStop(0,   'rgba(255,240,180,1)');
-  spot.addColorStop(0.3, 'rgba(255,210,100,0.7)');
-  spot.addColorStop(0.7, 'rgba(255,170,50,0.3)');
-  spot.addColorStop(1,   'rgba(0,0,0,0)');
-  ctx.fillStyle = spot; ctx.fillRect(0,0,1024,512);
-
-  // Right-side warm light spot
-  const spot2 = ctx.createRadialGradient(900,300,0,900,300,120);
-  spot2.addColorStop(0,   'rgba(255,200,60,0.8)');
-  spot2.addColorStop(1,   'rgba(0,0,0,0)');
-  ctx.fillStyle = spot2; ctx.fillRect(0,0,1024,512);
-
-  const et = new THREE.CanvasTexture(ec);
-  et.mapping = THREE.EquirectangularReflectionMapping;
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  pmrem.compileEquirectangularShader();
-  scene.environment = pmrem.fromEquirectangular(et).texture;
-  pmrem.dispose(); et.dispose();
-})();
-
-/* Gold material — MeshPhysicalMaterial for clearcoat + better reflections */
-const goldMat = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color(0xc89b28),
-  metalness: 1.0, roughness: 0.06,
-  clearcoat: 0.6, clearcoatRoughness: 0.08,
-  envMapIntensity: 2.5, reflectivity: 1.0
-});
-const goldMat2 = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color(0xe8c040),
-  metalness: 0.95, roughness: 0.10,
-  clearcoat: 0.4, clearcoatRoughness: 0.1,
-  envMapIntensity: 2.0
-});
-
-/* ── KEY GEOMETRY ────────────────────────── */
-const _kg = new THREE.Group();
-keyGroup = _kg;
-
-// Bow: 4 interlocked rings — high segment count for smooth gold look
-const R = 0.32, tube = 0.10, off = 0.27;
-[[-off,off],[ off,off],[-off,-off],[off,-off]].forEach(([x,y])=>{
-  const m = new THREE.Mesh(new THREE.TorusGeometry(R, tube, 40, 140), goldMat);
-  m.position.set(x, y, 0);
-  _kg.add(m);
-});
-
-// Centre sphere bridging the 4 rings
-keyGroup.add(Object.assign(
-  new THREE.Mesh(new THREE.SphereGeometry(0.17,32,32), goldMat2),
-  {position: new THREE.Vector3(0,0,0)}
-));
-
-// Shaft connection nub
-const nub = new THREE.Mesh(new THREE.CylinderGeometry(0.088,0.088,0.28,18), goldMat);
-nub.rotation.z = Math.PI/2;
-nub.position.set(0.52, -off, 0);
-keyGroup.add(nub);
-
-// Main shaft
-const shL = 2.1;
-const shaft = new THREE.Mesh(new THREE.BoxGeometry(shL, 0.175, 0.14), goldMat);
-shaft.position.set(off + 0.28 + shL/2, -off, 0);
-keyGroup.add(shaft);
-
-// Ridge on top of shaft
-const ridge = new THREE.Mesh(new THREE.BoxGeometry(shL*0.82, 0.055, 0.18), goldMat2);
-ridge.position.set(shaft.position.x + 0.08, -off + 0.115, 0);
-keyGroup.add(ridge);
-
-// Blade end
-const bladeX = off + 0.28 + shL;
-const blade = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.38, 0.14), goldMat);
-blade.position.set(bladeX + 0.07, -off - 0.1, 0);
-keyGroup.add(blade);
-
-// Teeth
-[{dx:-0.55,h:0.16},{dx:-0.28,h:0.22},{dx:0.02,h:0.13}].forEach(({dx,h})=>{
-  const t = new THREE.Mesh(new THREE.BoxGeometry(0.15, h, 0.14), goldMat2);
-  t.position.set(bladeX + dx, -off - 0.175 - h/2, 0);
-  keyGroup.add(t);
-});
-
-// Tilt key ~35° to match the concept art
-keyGroup.rotation.z = -Math.PI / 5.2;
-// Start off-screen above for intro animation
-keyGroup.position.set(0.35, 4, 0);
-keyGroup.scale.setScalar(0);
-scene.add(keyGroup);
-
-/* ── PARTICLE TRAIL ──────────────────────── */
-const pPos = new Float32Array(PC * 3);
-
-// Build a sweeping arc trail
-for(let i=0; i<PC; i++){
-  const t = i/PC;
-  const angle = t * Math.PI * 0.9 - 0.2;
-  pPos[i*3]   = Math.cos(angle) * (1.8 + (Math.random()-.5)*0.9);
-  pPos[i*3+1] = Math.sin(angle) * 0.65 - 0.45 + (Math.random()-.5)*0.4;
-  pPos[i*3+2] = (Math.random()-.5) * 0.35;
-}
-
-// Particle sprite texture
-const pc2d = document.createElement('canvas');
-pc2d.width = pc2d.height = 32;
-const pctx = pc2d.getContext('2d');
-const pg = pctx.createRadialGradient(16,16,0,16,16,16);
-pg.addColorStop(0,  'rgba(255,225,80,1)');
-pg.addColorStop(0.4,'rgba(212,175,55,.75)');
-pg.addColorStop(1,  'rgba(212,175,55,0)');
-pctx.fillStyle = pg;
-pctx.fillRect(0,0,32,32);
-
-pGeo = new THREE.BufferGeometry();
-pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
-
-pMat = new THREE.PointsMaterial({
-  size: 0.065,
-  map: new THREE.CanvasTexture(pc2d),
-  color: new THREE.Color(0xffd740),
-  transparent: true, opacity: 0.78,
-  depthWrite: false,
-  blending: THREE.AdditiveBlending
-});
-const _pts = new THREE.Points(pGeo, pMat);
-_pts.position.set(0.3, -0.2, -0.4);
-_pts.visible = false;
-scene.add(_pts);
-particles = _pts;
-
-/* ── ANIMATION STATE ─────────────────────── */
-document.addEventListener('mousemove', e=>{
-  mouseX = (e.clientX/window.innerWidth  - 0.5) * 2;
-  mouseY = (e.clientY/window.innerHeight - 0.5) * 2;
-});
-
-/* ── RENDER LOOP ─────────────────────────── */
-function tick(){
-  requestAnimationFrame(tick);
-  const t = performance.now() * 0.001;
-
-  // Smooth mouse parallax
-  parallaxX += (mouseX * 0.22 - parallaxX) * 0.055;
-  parallaxY += (-mouseY * 0.16 - parallaxY) * 0.055;
-
-  if(introComplete){
-    keyGroup.rotation.x = parallaxY;
-    keyGroup.rotation.y = parallaxX;
-    keyGroup.position.x = 0.35 + parallaxX * 0.28;
-    keyGroup.position.y = keyBaseY + Math.sin(t * 0.75) * 0.075 + parallaxY * 0.1;
-  }
-
-  // Animate particles gently
-  if(particles.visible){
-    pTime += 0.008;
-    const pa = pGeo.attributes.position.array;
-    for(let i=0; i<PC; i++){
-      pa[i*3+1] += Math.sin(pTime + i * 0.28) * 0.0018;
-      pa[i*3]   += Math.cos(pTime * 0.6 + i * 0.22) * 0.0008;
-    }
-    pGeo.attributes.position.needsUpdate = true;
-    pMat.opacity = 0.55 + Math.sin(t * 1.4) * 0.12;
-  }
-
-  // Subtle light dance
-  pt1.position.x = Math.sin(t * 0.55) * 1.8 + 1;
-  pt1.position.y = Math.cos(t * 0.38) * 1.2 + 3;
-
-  renderer.render(scene, camera);
-}
-tick();
-
-/* ── RESIZE ──────────────────────────────── */
-window.addEventListener('resize',()=>{
-  const w = window.innerWidth, h = window.innerHeight;
-  camera.aspect = w/h;
-  camera.updateProjectionMatrix();
-  renderer.setSize(w, h);
-});
-
-} catch(err) {
-  console.warn('[Feel\'HomeBnb] 3D key disabled:', err.message || err);
-  const cv = document.getElementById('key-canvas');
-  if(cv) cv.style.display = 'none';
-}
-
-/* ═══════════════════════════════════════════
-   GSAP — always runs, 3D tweens only if key loaded
-═══════════════════════════════════════════ */
-const introTl = gsap.timeline({paused:true});
-
-// 1. Fade loader out
-introTl.to('#loader',{opacity:0, duration:.7, ease:'power2.inOut',
-  onComplete:()=>{ document.getElementById('loader').style.display='none'; }
-});
-
-// 2. Key drops + scales in (only if Three.js succeeded)
-if(keyGroup){
-  introTl.to(keyGroup.position,{y:0, duration:1.3, ease:'back.out(1.4)'}, '-=0.1');
-  introTl.to(keyGroup.scale,{x:1,y:1,z:1, duration:1.1, ease:'back.out(1.8)'}, '<');
-}
-
-// 3. Particles appear
-introTl.call(()=>{ if(particles) particles.visible = true; }, null, '-=0.6');
-
-// 4. Logo fades in
-introTl.fromTo('#logo',
-  {opacity:0, y:-22},
-  {opacity:1, y:0, duration:.95, ease:'power3.out'}, '-=0.7'
-);
-
-// 5. Hero text slides in
-introTl.fromTo('#hero-text',
-  {opacity:0, x:-38},
-  {opacity:1, x:0, duration:.9, ease:'power3.out'}, '-=0.65'
-);
-
-// 6. Window fades in
-introTl.fromTo('#window-arch',
-  {opacity:0, y:16},
-  {opacity:1, y:0, duration:.8, ease:'power2.out'}, '-=0.5'
-);
-
-// 7. Properties bar rises
-introTl.fromTo('#properties',
-  {opacity:0, y:24},
-  {opacity:1, y:0, duration:.75, ease:'power3.out'}, '-=0.4'
-);
-
-// 8. Corner ornaments
-introTl.fromTo('.orn',
-  {opacity:0},
-  {opacity:1, duration:.5, stagger:.08, ease:'power2.out'}, '-=0.45'
-);
-
-// 9. Scroll hint
-introTl.fromTo('#scroll-hint',
-  {opacity:0},
-  {opacity:1, duration:.4}, '-=0.2'
-);
-
-introTl.call(()=>{ introComplete = true; keyBaseY = 0; });
-
-/* Loader entry animation, then kick off intro */
-gsap.timeline()
-  .to('.loader-key',  {opacity:1, y:0, duration:.6, ease:'power2.out'})
-  .to('.loader-brand',{opacity:1,       duration:.7, ease:'power2.out'}, '-=0.2')
-  .call(()=> introTl.play(), null, '+=1.0');
-
-/* ── SCROLL PARALLAX (room bg) ───────────── */
-gsap.to('.bg-room',{
-  yPercent: 18, ease:'none',
-  scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}
-});
-
-/* gentle scroll parallax on text */
-gsap.to('#hero-text',{
-  y: -30, ease:'none',
-  scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}
-});
-
-})();
-</script>
-</body>
-</html>
+</body></html>
