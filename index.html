@@ -159,17 +159,19 @@
   }
   .cta-row { display: flex; gap: 14px; align-items: center; flex-wrap: nowrap; }
   .btn {
-    display: inline-flex; align-items: center; gap: 12px;
-    padding: 17px 30px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 11px 30px;
     font-family: 'Cormorant Garamond', serif;
     font-size: 16px;
+    font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
+    text-align: center;
     text-decoration: none;
     color: var(--navy-0);
     background: linear-gradient(180deg, var(--gold-4) 0%, var(--gold-3) 35%, var(--gold-2) 65%, var(--gold-1) 100%);
     border: none;
-    border-radius: 2px;
+    border-radius: 10px;
     cursor: pointer;
     box-shadow:
       0 0 0 1px rgba(255,243,200,.4) inset,
@@ -184,8 +186,11 @@
     backdrop-filter: blur(6px);
     border: 1px solid rgba(216,180,106,.45);
     box-shadow: none;
-    padding: 17px 20px;
+    padding: 11px 20px;
     font-size: 14px;
+    font-weight: 700;
+    justify-content: center;
+    text-align: center;
   }
   .btn-ghost:hover { background: rgba(216,180,106,.12); transform: translateY(-1px); }
 
