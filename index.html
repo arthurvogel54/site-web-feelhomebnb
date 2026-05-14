@@ -334,7 +334,15 @@
   }
   .property:hover { transform: translateY(-4px); box-shadow: 0 30px 60px rgba(0,0,0,.7), 0 0 0 1px rgba(243,223,155,.4); }
   .property-slot { width: 100%; height: 100%; display: block; }
-  .property-label {
+  .property::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(3,8,31,.55) 70%, rgba(3,8,31,.88) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .property-label { z-index: 2; }
     position: absolute;
     left: 14px; bottom: 12px;
     font-family: 'Cormorant Garamond', serif;
