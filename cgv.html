@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CGV — Feel'HomeBNB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Pinyon+Script&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-0: #03081f;
+    --navy-1: #060f3a;
+    --gold-1: #b5894a;
+    --gold-2: #d8b46a;
+    --gold-3: #f3df9b;
+    --gold-4: #fff3c8;
+    --ivory: #f5efe2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy-0);
+    color: var(--ivory);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(180deg, #000 0%, var(--navy-0) 100%);
+    padding: 32px 80px;
+    border-bottom: 1px solid rgba(216,180,106,.18);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo-link img {
+    height: 60px;
+    filter: drop-shadow(0 2px 12px rgba(216,180,106,.3));
+  }
+  .back-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    text-decoration: none;
+    opacity: .8;
+    transition: opacity .2s;
+  }
+  .back-link:hover { opacity: 1; }
+
+  .page-hero {
+    text-align: center;
+    padding: 80px 40px 60px;
+    border-bottom: 1px solid rgba(216,180,106,.12);
+  }
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 20px;
+    opacity: .9;
+  }
+  .page-hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 4vw, 54px);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ivory);
+    margin-bottom: 16px;
+  }
+  .page-hero p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: rgba(245,239,226,.6);
+  }
+
+  .content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 80px 40px 120px;
+  }
+
+  .section {
+    margin-bottom: 56px;
+    padding-bottom: 56px;
+    border-bottom: 1px solid rgba(216,180,106,.1);
+  }
+  .section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    margin-bottom: 22px;
+    counter-increment: section;
+  }
+  h2::before {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--gold-2);
+    vertical-align: middle;
+    margin-right: 14px;
+    transform: translateY(-2px);
+  }
+
+  p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: rgba(245,239,226,.82);
+    margin-bottom: 16px;
+  }
+  p:last-child { margin-bottom: 0; }
+
+  strong {
+    font-weight: 600;
+    color: var(--ivory);
+  }
+
+  ul {
+    margin: 12px 0 16px 0;
+    padding-left: 0;
+    list-style: none;
+  }
+  ul li {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: rgba(245,239,226,.82);
+    padding-left: 22px;
+    position: relative;
+    margin-bottom: 8px;
+  }
+  ul li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--gold-2);
+  }
+
+  a {
+    color: var(--gold-3);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(243,223,155,.3);
+    transition: border-color .2s;
+  }
+  a:hover { border-color: var(--gold-3); }
+
+  footer {
+    text-align: center;
+    padding: 40px 80px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(216,180,106,.4);
+    background: #000;
+    border-top: 1px solid rgba(216,180,106,.1);
+  }
+
+  @media (max-width: 700px) {
+    header { padding: 24px 24px; }
+    .content { padding: 50px 24px 80px; }
+    .page-hero { padding: 60px 24px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo-link">
+    <img src="assets/logo.png" alt="Feel'HomeBNB">
+  </a>
+  <a href="index.html" class="back-link">← Retour au site</a>
+</header>
+
+<div class="page-hero">
+  <div class="eyebrow">Conditions générales de vente</div>
+  <h1>CGV</h1>
+  <p>En vigueur au 1er janvier 2026 — Feel'HomeBNB, Varangéville (54)</p>
+</div>
+
+<div class="content">
+
+  <div class="section">
+    <h2>Article 1 — Objet</h2>
+    <p>Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre Feel'HomeBNB, micro-entreprise représentée par Marwan Aït-Malouk, SIRET 939 685 574 00013, dont le siège est situé au 62 Rue Gabriel Péri, 54110 Varangéville, et toute personne physique ou morale (le « Client ») souhaitant bénéficier de ses services de conciergerie et de location courte durée.</p>
+    <p>Toute réservation ou commande implique l'acceptation pleine et entière des présentes CGV.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 2 — Services proposés</h2>
+    <p>Feel'HomeBNB propose les services suivants :</p>
+    <ul>
+      <li>Location courte durée de biens immobiliers situés à Nancy et ses environs</li>
+      <li>Accueil et remise des clés aux voyageurs</li>
+      <li>Conciergerie et assistance 24h/7j pendant le séjour</li>
+      <li>Ménage et préparation des logements entre chaque séjour</li>
+      <li>Gestion complète des annonces sur les plateformes de location (Airbnb, etc.)</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Article 3 — Réservation</h2>
+    <p>Les réservations s'effectuent via les plateformes partenaires (Airbnb et autres) ou directement auprès de Feel'HomeBNB par téléphone ou e-mail. Toute réservation est définitive dès la confirmation par écrit (e-mail ou message via la plateforme).</p>
+    <p>Le Client s'engage à fournir des informations exactes lors de la réservation. Feel'HomeBNB se réserve le droit de refuser toute réservation en cas d'informations incomplètes ou erronées.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 4 — Tarifs</h2>
+    <p>Les tarifs sont indiqués en euros TTC (Feel'HomeBNB, en tant que micro-entreprise, ne facture pas la TVA conformément à l'article 293 B du CGI).</p>
+    <p>Les prix comprennent la mise à disposition du logement pour la durée convenue, le linge de maison, le ménage de fin de séjour et l'accès aux services de conciergerie.</p>
+    <p>Feel'HomeBNB se réserve le droit de modifier ses tarifs à tout moment. Les réservations confirmées ne sont pas affectées par une modification tarifaire postérieure.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 5 — Modalités de paiement</h2>
+    <p>Le paiement s'effectue selon les modalités propres à chaque plateforme de réservation utilisée. Pour les réservations directes :</p>
+    <ul>
+      <li>Un acompte de 30 % est exigible à la réservation</li>
+      <li>Le solde est dû au plus tard 7 jours avant la date d'arrivée</li>
+      <li>Modes de paiement acceptés : virement bancaire, espèces</li>
+    </ul>
+    <p>Tout défaut de paiement entraîne l'annulation automatique de la réservation.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 6 — Annulation et remboursement</h2>
+    <p><strong>Annulation par le Client :</strong></p>
+    <ul>
+      <li>Plus de 14 jours avant l'arrivée : remboursement intégral de l'acompte</li>
+      <li>Entre 7 et 14 jours avant l'arrivée : remboursement de 50 % de l'acompte</li>
+      <li>Moins de 7 jours avant l'arrivée : aucun remboursement</li>
+    </ul>
+    <p><strong>Annulation par Feel'HomeBNB :</strong> En cas de force majeure ou d'impossibilité technique, Feel'HomeBNB procède au remboursement intégral des sommes versées, sans indemnité supplémentaire.</p>
+    <p>Pour les réservations effectuées via Airbnb ou autre plateforme, la politique d'annulation de ladite plateforme s'applique.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 7 — Obligations du Client</h2>
+    <p>Le Client s'engage à :</p>
+    <ul>
+      <li>Utiliser le logement en bon père de famille et le restituer dans l'état initial</li>
+      <li>Ne pas dépasser la capacité maximale d'accueil indiquée pour chaque bien</li>
+      <li>Respecter le règlement intérieur remis lors de l'arrivée</li>
+      <li>Signaler immédiatement tout dommage ou dysfonctionnement constaté</li>
+      <li>Ne pas organiser de fêtes ou événements sans autorisation préalable écrite</li>
+    </ul>
+    <p>Tout dommage causé au logement ou à son équipement sera facturé au Client sur la base du coût réel de remise en état.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 8 — Dépôt de garantie</h2>
+    <p>Un dépôt de garantie peut être demandé selon le bien réservé. Son montant est indiqué au moment de la réservation. Il est restitué dans un délai de 7 jours après le départ du Client, déduction faite des éventuels dommages constatés.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 9 — Responsabilité</h2>
+    <p>Feel'HomeBNB met tout en œuvre pour assurer la qualité et la conformité des logements proposés. Toutefois, sa responsabilité ne saurait être engagée en cas de force majeure, de vol, d'accident ou de dommage résultant d'une mauvaise utilisation du logement par le Client.</p>
+    <p>Il est conseillé au Client de souscrire une assurance voyage couvrant les risques d'annulation et de responsabilité civile.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 10 — Données personnelles</h2>
+    <p>Les données personnelles collectées dans le cadre de la réservation sont traitées conformément au RGPD et à la politique de confidentialité de Feel'HomeBNB (voir <a href="mentions-legales.html">Mentions légales</a>). Elles sont utilisées exclusivement pour la gestion de la relation client et ne sont pas transmises à des tiers.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 11 — Litiges</h2>
+    <p>En cas de litige, le Client est invité à contacter Feel'HomeBNB en priorité par e-mail à <a href="mailto:feelhomebnb@gmail.com">feelhomebnb@gmail.com</a> afin de trouver une solution amiable.</p>
+    <p>À défaut de résolution amiable, le litige sera soumis aux tribunaux compétents du ressort de Nancy, conformément au droit français.</p>
+  </div>
+
+  <div class="section">
+    <h2>Article 12 — Modification des CGV</h2>
+    <p>Feel'HomeBNB se réserve le droit de modifier les présentes CGV à tout moment. Les CGV applicables sont celles en vigueur à la date de la réservation. La version actualisée est disponible en permanence sur ce site.</p>
+  </div>
+
+</div>
+
+<footer>Feel'HomeBNB · Conciergerie Premium · Nancy · © 2026</footer>
+
+</body>
+</html>
