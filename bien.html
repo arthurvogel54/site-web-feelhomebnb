@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feel'HomeBNB — Détail du bien</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Pinyon+Script&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<script src="biens-config.js"></script>
+<script src="image-slot.js"></script>
+<style>
+  :root {
+    --navy-0: #03081f;
+    --navy-1: #060f3a;
+    --gold-1: #b5894a;
+    --gold-2: #d8b46a;
+    --gold-3: #f3df9b;
+    --gold-4: #fff3c8;
+    --ivory:  #f5efe2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  html, body {
+    background: var(--navy-0);
+    color: var(--ivory);
+    font-family: 'Inter', sans-serif;
+  }
+  body { overflow-x: hidden; }
+
+  /* ===== HEADER ===== */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 48px;
+    background: rgba(3,8,31,.96);
+    border-bottom: 1px solid rgba(216,180,106,.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .page-header img {
+    height: 60px;
+    width: auto;
+    display: block;
+  }
+  .back-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color .2s;
+  }
+  .back-link:hover { color: var(--gold-4); }
+
+  /* ===== GALLERY ===== */
+  .gallery-wrap {
+    max-width: 1400px;
+    margin: 40px auto 0;
+    padding: 0 32px;
+  }
+  .gallery-main {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    grid-template-rows: 520px;
+    gap: 8px;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .gallery-main-photo {
+    grid-column: 1;
+    grid-row: 1;
+    height: 520px;
+    display: block;
+    overflow: hidden;
+  }
+  .gallery-grid-2x2 {
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    height: 520px;
+  }
+  .gallery-grid-2x2 > * {
+    display: block;
+    overflow: hidden;
+  }
+  .gallery-row-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .gallery-row-5 > * {
+    height: 180px;
+    display: block;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  image-slot {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ===== INFO SECTION ===== */
+  .info-section {
+    max-width: 1400px;
+    margin: 56px auto 0;
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .info-left h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: 1px;
+    color: var(--gold-2);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .info-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 21px;
+    color: rgba(245,239,226,.85);
+    margin-bottom: 24px;
+    line-height: 1.4;
+  }
+  .info-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: rgba(245,239,226,.78);
+    margin-bottom: 32px;
+  }
+  .info-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid rgba(216,180,106,.3);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--gold-3);
+    background: rgba(216,180,106,.06);
+  }
+  .stat-chip svg {
+    width: 18px;
+    height: 18px;
+    color: var(--gold-2);
+    flex-shrink: 0;
+  }
+
+  /* Amenities */
+  .info-right h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 26px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ivory);
+    margin-bottom: 28px;
+  }
+  .amenity-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 24px;
+  }
+  .amenity-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    line-height: 1.4;
+    color: rgba(245,239,226,.85);
+  }
+  .amenity-list li::before {
+    content: '✦';
+    color: var(--gold-2);
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  /* ===== BOOKING SECTION ===== */
+  .booking-section {
+    max-width: 860px;
+    margin: 72px auto 0;
+    padding: 0 32px;
+  }
+  .booking-box {
+    border: 1px solid rgba(216,180,106,.3);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(216,180,106,.07), rgba(216,180,106,.02));
+    backdrop-filter: blur(4px);
+    padding: 48px 52px;
+  }
+  .booking-box h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 34px;
+    color: var(--ivory);
+    margin-bottom: 36px;
+    text-align: center;
+  }
+  .date-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .date-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .date-group label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-3);
+  }
+  .date-group input[type="date"] {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(3,8,31,.7);
+    border: 1px solid rgba(216,180,106,.35);
+    border-radius: 8px;
+    color: var(--ivory);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s;
+    color-scheme: dark;
+  }
+  .date-group input[type="date"]:focus {
+    border-color: var(--gold-2);
+  }
+
+  /* Récapitulatif */
+  .recap-block {
+    display: none;
+    background: rgba(3,8,31,.6);
+    border: 1px solid rgba(216,180,106,.2);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .recap-block.visible { display: block; }
+  .recap-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: rgba(245,239,226,.82);
+    margin-bottom: 10px;
+  }
+  .recap-line:last-child { margin-bottom: 0; }
+  .recap-total {
+    border-top: 1px solid rgba(216,180,106,.25);
+    padding-top: 14px;
+    margin-top: 14px;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--gold-2);
+  }
+
+  /* Boutons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 36px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    color: var(--navy-0);
+    background: linear-gradient(180deg, var(--gold-4) 0%, var(--gold-3) 35%, var(--gold-2) 65%, var(--gold-1) 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow:
+      0 0 0 1px rgba(255,243,200,.4) inset,
+      0 0 30px rgba(216,180,106,.45),
+      0 12px 30px rgba(0,0,0,.5);
+    transition: transform .25s ease, box-shadow .25s ease;
+    width: 100%;
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 1px rgba(255,243,200,.6) inset, 0 0 40px rgba(243,223,155,.7), 0 14px 36px rgba(0,0,0,.6);
+  }
+  .btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Formulaire Stripe */
+  .stripe-form {
+    display: none;
+    margin-top: 28px;
+  }
+  .stripe-form.visible { display: block; }
+  .stripe-form h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ivory);
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  #stripe-card-element {
+    padding: 14px 18px;
+    background: rgba(3,8,31,.8);
+    border: 1px solid rgba(216,180,106,.35);
+    border-radius: 8px;
+    margin-bottom: 18px;
+  }
+  .stripe-error {
+    color: #ff6b6b;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    margin-bottom: 16px;
+    min-height: 20px;
+    text-align: center;
+  }
+  .stripe-success {
+    display: none;
+    text-align: center;
+    padding: 28px;
+    border: 1px solid rgba(216,180,106,.4);
+    border-radius: 10px;
+    background: rgba(216,180,106,.08);
+    margin-top: 20px;
+  }
+  .stripe-success.visible { display: block; }
+  .stripe-success h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: var(--gold-2);
+    margin-bottom: 10px;
+  }
+  .stripe-success p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: rgba(245,239,226,.8);
+    font-style: italic;
+  }
+
+  /* ===== NOT FOUND ===== */
+  .not-found {
+    max-width: 600px;
+    margin: 120px auto;
+    text-align: center;
+    padding: 0 32px;
+  }
+  .not-found h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    color: var(--gold-2);
+    margin-bottom: 16px;
+  }
+  .not-found p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: rgba(245,239,226,.7);
+    margin-bottom: 32px;
+  }
+  .not-found a {
+    color: var(--gold-3);
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(216,180,106,.4);
+    padding-bottom: 2px;
+    transition: color .2s;
+  }
+  .not-found a:hover { color: var(--gold-4); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 50px 80px 40px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(216,180,106,.5);
+    background: #03081f;
+    margin-top: 100px;
+    border-top: 1px solid rgba(216,180,106,.12);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .page-header { padding: 14px 20px; }
+    .gallery-wrap { padding: 0 16px; margin-top: 24px; }
+    .gallery-main {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      height: auto;
+    }
+    .gallery-main-photo { height: 280px; }
+    .gallery-grid-2x2 {
+      grid-column: 1;
+      height: 200px;
+    }
+    .gallery-row-5 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .gallery-row-5 > *:last-child { display: none; }
+    .info-section {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 0 16px;
+    }
+    .info-left h1 { font-size: 32px; }
+    .amenity-list { grid-template-columns: 1fr; }
+    .booking-section { padding: 0 16px; }
+    .booking-box { padding: 28px 24px; }
+    .date-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="page-header">
+  <a href="index.html">
+    <img src="assets/logo.png" alt="Feel'HomeBNB Conciergerie">
+  </a>
+  <a href="index.html#biens" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+    </svg>
+    Nos biens
+  </a>
+</header>
+
+<!-- ===== CONTENU PRINCIPAL ===== -->
+<main id="main-content">
+  <!-- Rempli dynamiquement -->
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  Feel'HomeBNB · Conciergerie Premium · Nancy · &copy; 2026
+  <div style="margin-top:16px;display:flex;justify-content:center;gap:32px;">
+    <a href="mentions-legales.html" style="color:rgba(216,180,106,.5);text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;transition:color .2s;" onmouseover="this.style.color='rgba(216,180,106,1)'" onmouseout="this.style.color='rgba(216,180,106,.5)'">Mentions légales</a>
+    <a href="cgv.html" style="color:rgba(216,180,106,.5);text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase;transition:color .2s;" onmouseover="this.style.color='rgba(216,180,106,1)'" onmouseout="this.style.color='rgba(216,180,106,.5)'">CGV</a>
+  </div>
+</footer>
+
+<script>
+// =====================================================================
+// CONFIGURATION STRIPE — remplacer la clé publishable ci-dessous
+// =====================================================================
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_VOTRE_CLE_PUBLISHABLE_ICI'; // ← remplacer par votre clé publishable Stripe
+
+// =====================================================================
+// INIT
+// =====================================================================
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const bienId = params.get('id');
+  const main   = document.getElementById('main-content');
+
+  // Vérification de l'identifiant
+  if (!bienId || !window.BIENS_CONFIG || !window.BIENS_CONFIG[bienId]) {
+    main.innerHTML = `
+      <div class="not-found">
+        <h1>Bien introuvable</h1>
+        <p>L'hébergement demandé n'existe pas ou l'adresse est incorrecte.</p>
+        <a href="index.html#biens">← Retourner à nos biens</a>
+      </div>`;
+    return;
+  }
+
+  const bien = window.BIENS_CONFIG[bienId];
+
+  // Mise à jour du titre de la page
+  document.title = `Feel'HomeBNB — ${bien.name}`;
+
+  // Construction de l'icône selon la stat
+  function statIcon(type) {
+    const icons = {
+      capacity: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>`,
+      surface: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+      </svg>`,
+      beds: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 4v16M22 4v16M2 8h20M2 12h20M6 8v8M18 8v8"/>
+      </svg>`,
+      bathrooms: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 6 L9 2 A2 2 0 0 1 13 2"/>
+        <path d="M4 12 L4 19 A2 2 0 0 0 6 21 L18 21 A2 2 0 0 0 20 19 L20 12 Z"/>
+        <path d="M2 12 L22 12"/>
+      </svg>`,
+      jacuzzi: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12h20M12 2v4M6 4l2 2M18 4l-2 2M4 20h16a2 2 0 0 0 2-2v-6H2v6a2 2 0 0 0 2 2z"/>
+      </svg>`,
+    };
+    return icons[type] || '';
+  }
+
+  // Construction des stats
+  const stats = [
+    { type: 'capacity',  label: `${bien.capacity} voyageur${bien.capacity > 1 ? 's' : ''}` },
+    { type: 'surface',   label: `${bien.surface} m²` },
+    { type: 'beds',      label: `${bien.beds} lit${bien.beds > 1 ? 's' : ''}` },
+    { type: 'bathrooms', label: `${bien.bathrooms} salle${bien.bathrooms > 1 ? 's' : ''} de bain` },
+  ];
+  if (bien.jacuzzi) stats.push({ type: 'jacuzzi', label: 'Jacuzzi privatif' });
+
+  const statsHtml = stats.map(s => `
+    <div class="stat-chip">
+      ${statIcon(s.type)}
+      ${s.label}
+    </div>`).join('');
+
+  // Commodités
+  const amenitiesHtml = (bien.amenities || [])
+    .map(a => `<li>${a}</li>`)
+    .join('');
+
+  // Slots photos : 10 slots avec id BIENID-photo-1 à BIENID-photo-10
+  const photoSlots = Array.from({ length: 10 }, (_, i) =>
+    `<image-slot id="${bienId}-photo-${i + 1}" shape="rect" placeholder="${bien.name} — photo ${i + 1}"></image-slot>`
+  );
+
+  main.innerHTML = `
+    <!-- GALERIE -->
+    <div class="gallery-wrap">
+      <div class="gallery-main">
+        <div class="gallery-main-photo">${photoSlots[0]}</div>
+        <div class="gallery-grid-2x2">
+          ${photoSlots[1]}
+          ${photoSlots[2]}
+          ${photoSlots[3]}
+          ${photoSlots[4]}
+        </div>
+      </div>
+      <div class="gallery-row-5">
+        ${photoSlots[5]}
+        ${photoSlots[6]}
+        ${photoSlots[7]}
+        ${photoSlots[8]}
+        ${photoSlots[9]}
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="info-section">
+      <div class="info-left">
+        <h1 id="bien-title">${bien.name}</h1>
+        <p class="info-tagline">${bien.tagline}</p>
+        <p class="info-desc">${bien.description}</p>
+        <div class="info-stats">${statsHtml}</div>
+      </div>
+      <div class="info-right">
+        <h2>Commodités</h2>
+        <ul class="amenity-list">${amenitiesHtml}</ul>
+      </div>
+    </div>
+
+    <!-- RÉSERVATION -->
+    <div class="booking-section">
+      <div class="booking-box">
+        <h2>Réserver ce bien</h2>
+
+        <div class="date-row">
+          <div class="date-group">
+            <label for="checkin">Arrivée</label>
+            <input type="date" id="checkin" name="checkin">
+          </div>
+          <div class="date-group">
+            <label for="checkout">Départ</label>
+            <input type="date" id="checkout" name="checkout">
+          </div>
+        </div>
+
+        <!-- Récapitulatif -->
+        <div class="recap-block" id="recap-block">
+          <div class="recap-line">
+            <span id="recap-nights-label">Nuits × tarif</span>
+            <span id="recap-subtotal"></span>
+          </div>
+          <div class="recap-line">
+            <span>Frais de ménage</span>
+            <span id="recap-cleaning"></span>
+          </div>
+          <div class="recap-line recap-total">
+            <span>Total</span>
+            <span id="recap-total"></span>
+          </div>
+        </div>
+
+        <button class="btn" id="btn-proceed" style="display:none;">
+          Procéder au paiement
+        </button>
+
+        <!-- Formulaire Stripe (masqué par défaut) -->
+        <div class="stripe-form" id="stripe-form">
+          <h3>Paiement sécurisé</h3>
+          <div id="stripe-card-element"></div>
+          <div class="stripe-error" id="stripe-error"></div>
+          <button class="btn" id="btn-pay">
+            Payer <span id="btn-pay-amount"></span>
+          </button>
+        </div>
+
+        <!-- Message de succès -->
+        <div class="stripe-success" id="stripe-success">
+          <h3>Réservation confirmée !</h3>
+          <p>Merci pour votre confiance. Notre équipe vous contactera prochainement.</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // ===================================================================
+  // LOGIQUE DATES & RÉCAPITULATIF
+  // ===================================================================
+  const checkinEl  = document.getElementById('checkin');
+  const checkoutEl = document.getElementById('checkout');
+  const recapBlock = document.getElementById('recap-block');
+  const btnProceed = document.getElementById('btn-proceed');
+
+  // Date minimum = aujourd'hui
+  const todayStr = new Date().toISOString().split('T')[0];
+  checkinEl.setAttribute('min', todayStr);
+  checkoutEl.setAttribute('min', todayStr);
+
+  let currentTotal = null;
+
+  function updateRecap() {
+    const checkIn  = checkinEl.value;
+    const checkOut = checkoutEl.value;
+
+    if (!checkIn || !checkOut) {
+      recapBlock.classList.remove('visible');
+      btnProceed.style.display = 'none';
+      return;
+    }
+
+    const result = window.calculateTotal(bienId, checkIn, checkOut);
+    if (!result || result.nights < 1) {
+      recapBlock.classList.remove('visible');
+      btnProceed.style.display = 'none';
+      return;
+    }
+
+    currentTotal = result;
+
+    document.getElementById('recap-nights-label').textContent =
+      `${result.nights} nuit${result.nights > 1 ? 's' : ''} × ${result.pricePerNight} €/nuit`;
+    document.getElementById('recap-subtotal').textContent  = `${result.subtotal} €`;
+    document.getElementById('recap-cleaning').textContent  = `${result.cleaning} €`;
+    document.getElementById('recap-total').textContent     = `${result.total} €`;
+
+    recapBlock.classList.add('visible');
+    btnProceed.style.display = 'block';
+  }
+
+  checkinEl.addEventListener('change', function () {
+    // La date de départ doit être >= arrivée + 1
+    if (this.value) {
+      const nextDay = new Date(this.value);
+      nextDay.setDate(nextDay.getDate() + 1);
+      checkoutEl.setAttribute('min', nextDay.toISOString().split('T')[0]);
+      if (checkoutEl.value && checkoutEl.value <= this.value) {
+        checkoutEl.value = '';
+      }
+    }
+    updateRecap();
+  });
+
+  checkoutEl.addEventListener('change', updateRecap);
+
+  // ===================================================================
+  // STRIPE
+  // ===================================================================
+  let stripe      = null;
+  let elements    = null;
+  let cardElement = null;
+
+  btnProceed.addEventListener('click', function () {
+    if (!currentTotal || currentTotal.nights < 1) return;
+
+    // Révéler le formulaire Stripe
+    document.getElementById('stripe-form').classList.add('visible');
+    document.getElementById('btn-pay-amount').textContent = `${currentTotal.total} €`;
+    btnProceed.style.display = 'none';
+
+    // Initialiser Stripe Elements si pas encore fait
+    if (!stripe) {
+      try {
+        stripe   = Stripe(STRIPE_PUBLISHABLE_KEY);
+        elements = stripe.elements();
+        cardElement = elements.create('card', {
+          style: {
+            base: {
+              color:           '#f5efe2',
+              fontFamily:      'Inter, sans-serif',
+              fontSize:        '16px',
+              '::placeholder': { color: 'rgba(245,239,226,0.45)' },
+              iconColor:       '#d8b46a',
+            },
+            invalid: { color: '#ff6b6b' },
+          },
+        });
+        cardElement.mount('#stripe-card-element');
+      } catch (e) {
+        document.getElementById('stripe-error').textContent =
+          'Stripe non disponible — vérifiez votre clé publishable.';
+      }
+    }
+
+    // Scroll vers le formulaire
+    document.getElementById('stripe-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  const btnPay = document.getElementById('btn-pay');
+  btnPay.addEventListener('click', async function () {
+    if (!stripe || !cardElement || !currentTotal) return;
+
+    btnPay.disabled = true;
+    btnPay.textContent = 'Traitement en cours…';
+    document.getElementById('stripe-error').textContent = '';
+
+    try {
+      // 1. Créer le PaymentIntent côté serveur
+      const response = await fetch('/api/create-payment-intent', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          amount:       currentTotal.total,
+          propertyName: bien.name,
+          checkIn:      checkinEl.value,
+          checkOut:     checkoutEl.value,
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Erreur serveur (${response.status})`);
+      }
+
+      const { clientSecret } = await response.json();
+
+      // 2. Confirmer le paiement côté client
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: { card: cardElement },
+      });
+
+      if (error) {
+        document.getElementById('stripe-error').textContent = error.message;
+        btnPay.disabled = false;
+        btnPay.textContent = `Payer ${currentTotal.total} €`;
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        document.getElementById('stripe-form').style.display    = 'none';
+        document.getElementById('stripe-success').classList.add('visible');
+      }
+    } catch (err) {
+      document.getElementById('stripe-error').textContent = err.message || 'Une erreur est survenue.';
+      btnPay.disabled = false;
+      document.getElementById('btn-pay-amount').textContent = `${currentTotal.total} €`;
+      btnPay.textContent = `Payer ${currentTotal.total} €`;
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
