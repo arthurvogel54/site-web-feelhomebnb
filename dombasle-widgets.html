@@ -454,9 +454,201 @@
       .testimonial-card { min-width: 280px; padding: 0 22px; }
       .banner-label { padding: 0 14px; }
     }
+
+    /* ══════════════════════════════════════════
+       3. INTRO SCREEN
+    ══════════════════════════════════════════ */
+
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Photo de fond avec effet Ken Burns (zoom lent simulant un drone) */
+    #intro-bg {
+      position: absolute;
+      inset: -8%;          /* légèrement plus grand pour que le zoom ne révèle pas les bords */
+      background-image: url('REMPLACER_PAR_URL_DE_LA_PHOTO');
+      background-size: cover;
+      background-position: center 40%;
+      animation: kenburns 18s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+
+    @keyframes kenburns {
+      0%   { transform: scale(1)    translate(0%,  0%); }
+      33%  { transform: scale(1.08) translate(-1.5%, 1%); }
+      66%  { transform: scale(1.13) translate(1%,  -1.5%); }
+      100% { transform: scale(1.18) translate(-0.5%, 0.5%); }
+    }
+
+    /* Voile sombre élégant sur la photo */
+    #intro-veil {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(10, 7, 4, 0.68) 0%,
+        rgba(30, 20, 10, 0.55) 50%,
+        rgba(10, 7, 4, 0.72) 100%
+      );
+    }
+
+    /* Contenu centré */
+    #intro-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0;
+      padding: 60px 48px;
+      max-width: 720px;
+      width: 100%;
+      animation: fadeInUp 1.4s ease both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Petit surtitre */
+    .intro-eyebrow {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: .72rem;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      opacity: .9;
+    }
+
+    /* Titre principal */
+    .intro-title {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: normal;
+      color: var(--white);
+      line-height: 1.18;
+      letter-spacing: .03em;
+      margin-bottom: 8px;
+    }
+
+    /* Sous-titre cursif / italic */
+    .intro-subtitle {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: clamp(.95rem, 2.2vw, 1.2rem);
+      font-style: italic;
+      font-weight: normal;
+      color: rgba(255,255,255,.72);
+      letter-spacing: .02em;
+      margin-bottom: 44px;
+      line-height: 1.6;
+      max-width: 520px;
+    }
+
+    /* Séparateur doré */
+    .intro-ornament {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 44px;
+      width: 100%;
+      max-width: 360px;
+    }
+    .intro-ornament-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: .6;
+    }
+    .intro-ornament-diamond {
+      color: var(--gold);
+      font-size: .7rem;
+      opacity: .8;
+      letter-spacing: 4px;
+    }
+
+    /* Bouton Commencer */
+    #intro-btn {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: .88rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,.5);
+      border-radius: 2px;
+      padding: 18px 52px;
+      cursor: pointer;
+      transition: background .35s, border-color .35s, color .35s;
+      position: relative;
+      overflow: hidden;
+    }
+    #intro-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(201,169,110,.18);
+      opacity: 0;
+      transition: opacity .35s;
+    }
+    #intro-btn:hover { border-color: var(--gold); }
+    #intro-btn:hover::before { opacity: 1; }
+
+    /* Localisation */
+    .intro-location {
+      margin-top: 36px;
+      font-family: 'Georgia', serif;
+      font-size: .65rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.38);
+    }
+
+    /* Animation de sortie */
+    #intro.hide {
+      animation: fadeOut .85s ease both;
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
   </style>
 </head>
 <body class="banner-visible">
+
+  <!-- ══════════════════════════════════════════
+       INTRO SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="intro">
+    <div id="intro-bg"></div>
+    <div id="intro-veil"></div>
+
+    <div id="intro-content">
+      <p class="intro-eyebrow">Port-sur-Seille · Lorraine</p>
+
+      <h1 class="intro-title">Domaine de Dombasle</h1>
+      <p class="intro-subtitle">Un écrin d'exception pour vos mariages,<br>séminaires et réceptions privées.</p>
+
+      <div class="intro-ornament">
+        <span class="intro-ornament-line"></span>
+        <span class="intro-ornament-diamond">✦</span>
+        <span class="intro-ornament-line"></span>
+      </div>
+
+      <button id="intro-btn" onclick="startVisit()">Commencer la visite</button>
+
+      <p class="intro-location">Domaine privé · Location événementielle</p>
+    </div>
+  </div>
 
   <!-- ══════════════════════════════════════════
        BOUTON FLOTTANT
@@ -713,6 +905,13 @@
        JAVASCRIPT
   ══════════════════════════════════════════ -->
   <script>
+    /* ── Intro screen ── */
+    function startVisit() {
+      const intro = document.getElementById('intro');
+      intro.classList.add('hide');
+      setTimeout(() => { intro.style.display = 'none'; }, 900);
+    }
+
     /* ── FAB ── */
     function toggleFab() {
       const btn   = document.getElementById('fab-main');
