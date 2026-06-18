@@ -1,969 +1,833 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Domaine de Dombasle – Widgets</title>
-  <style>
-    /* ── Palette ── */
-    :root {
-      --brown:      #7a6552;
-      --brown-dark: #5a4a3a;
-      --brown-light:#c8b49a;
-      --cream:      #faf7f4;
-      --white:      #ffffff;
-      --gold:       #c9a96e;
-      --shadow:     rgba(90,74,58,.22);
-    }
+<style>
+  /* ── Palette ── */
+  :root {
+    --brown:      #7a6552;
+    --brown-dark: #5a4a3a;
+    --brown-light:#c8b49a;
+    --cream:      #faf7f4;
+    --white:      #ffffff;
+    --gold:       #c9a96e;
+    --shadow:     rgba(90,74,58,.22);
+  }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      background: transparent;
-    }
+  /* ══════════════════════════════════════════
+     1. BOUTON FLOTTANT + MODAL
+  ══════════════════════════════════════════ */
 
-    /* ══════════════════════════════════════════
-       1. BOUTON FLOTTANT + MODAL
-    ══════════════════════════════════════════ */
+  #fab {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 
-    /* Bouton flottant */
-    #fab {
-      position: fixed;
-      top: 8px;
-      left: 8px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 12px;
-    }
+  #fab-quick {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(-12px) scale(.95);
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+    align-items: flex-start;
+  }
+  #fab-quick.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
 
-    /* Bulle de contact rapide (WhatsApp / Téléphone) */
-    #fab-quick {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      opacity: 0;
-      transform: translateY(-12px) scale(.95);
-      pointer-events: none;
-      transition: opacity .3s ease, transform .3s ease;
-      align-items: flex-start;
-    }
-    #fab-quick.open {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-    }
+  .fab-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--white);
+    border: 1.5px solid var(--brown-light);
+    border-radius: 50px;
+    padding: 10px 18px 10px 14px;
+    box-shadow: 0 4px 18px var(--shadow);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--brown-dark);
+    font-size: .88rem;
+    font-family: 'Georgia', serif;
+    letter-spacing: .02em;
+    transition: background .2s, transform .15s;
+    white-space: nowrap;
+  }
+  .fab-action:hover { background: var(--cream); transform: translateX(4px); }
+  .fab-action svg { flex-shrink: 0; }
 
-    .fab-action {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--white);
-      border: 1.5px solid var(--brown-light);
-      border-radius: 50px;
-      padding: 10px 18px 10px 14px;
-      box-shadow: 0 4px 18px var(--shadow);
-      cursor: pointer;
-      text-decoration: none;
-      color: var(--brown-dark);
-      font-size: .88rem;
-      font-family: 'Georgia', serif;
-      letter-spacing: .02em;
-      transition: background .2s, transform .15s;
-      white-space: nowrap;
-    }
-    .fab-action:hover { background: var(--cream); transform: translateX(4px); }
-    .fab-action svg { flex-shrink: 0; }
+  #fab-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--brown) 0%, var(--brown-dark) 100%);
+    color: var(--cream);
+    border: 2px solid rgba(255,255,255,0.55);
+    border-radius: 50px;
+    padding: 14px 24px;
+    font-family: 'Georgia', serif;
+    font-size: .9rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 6px 24px var(--shadow);
+    transition: transform .2s, box-shadow .2s;
+  }
+  #fab-main:hover { transform: translateY(-2px); box-shadow: 0 10px 32px var(--shadow); }
+  #fab-main .icon-close { display: none; }
+  #fab-main.open .icon-open { display: none; }
+  #fab-main.open .icon-close { display: block; }
 
-    /* Bouton principal */
-    #fab-main {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: linear-gradient(135deg, var(--brown) 0%, var(--brown-dark) 100%);
-      color: var(--cream);
-      border: 2px solid rgba(255,255,255,0.55);
-      border-radius: 50px;
-      padding: 14px 24px;
-      font-family: 'Georgia', serif;
-      font-size: .9rem;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      cursor: pointer;
-      box-shadow: 0 6px 24px var(--shadow);
-      transition: transform .2s, box-shadow .2s;
-    }
-    #fab-main:hover { transform: translateY(-2px); box-shadow: 0 10px 32px var(--shadow); }
-    #fab-main .icon-close { display: none; }
-    #fab-main.open .icon-open { display: none; }
-    #fab-main.open .icon-close { display: block; }
+  .fab-divider {
+    width: 100%;
+    text-align: center;
+    font-size: .7rem;
+    color: var(--brown-light);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 2px 0;
+  }
 
-    /* Ligne ornementale */
-    .fab-divider {
-      width: 100%;
-      text-align: center;
-      font-size: .7rem;
-      color: var(--brown-light);
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      padding: 2px 0;
-    }
+  /* ── Modal ── */
+  #modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(40,30,22,.55);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+  }
+  #modal-overlay.open { opacity: 1; pointer-events: auto; }
 
-    /* ── Modal formulaire ── */
-    #modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(40,30,22,.55);
-      backdrop-filter: blur(4px);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .3s ease;
-    }
-    #modal-overlay.open { opacity: 1; pointer-events: auto; }
+  #modal {
+    background: var(--cream);
+    border-radius: 6px;
+    width: min(520px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 44px 40px 36px;
+    position: relative;
+    transform: translateY(20px) scale(.97);
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 20px 60px rgba(0,0,0,.28);
+  }
+  #modal-overlay.open #modal { transform: translateY(0) scale(1); }
 
-    #modal {
-      background: var(--cream);
-      border-radius: 6px;
-      width: min(520px, 92vw);
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 44px 40px 36px;
-      position: relative;
-      transform: translateY(20px) scale(.97);
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
-      box-shadow: 0 20px 60px rgba(0,0,0,.28);
-    }
-    #modal-overlay.open #modal { transform: translateY(0) scale(1); }
+  #modal-close {
+    position: absolute;
+    top: 14px; right: 18px;
+    background: none; border: none;
+    font-size: 1.5rem; cursor: pointer;
+    color: var(--brown-light);
+    line-height: 1;
+    transition: color .2s;
+  }
+  #modal-close:hover { color: var(--brown-dark); }
 
-    #modal-close {
-      position: absolute;
-      top: 14px; right: 18px;
-      background: none; border: none;
-      font-size: 1.5rem; cursor: pointer;
-      color: var(--brown-light);
-      line-height: 1;
-      transition: color .2s;
-    }
-    #modal-close:hover { color: var(--brown-dark); }
+  .modal-logo { text-align: center; margin-bottom: 22px; }
+  .modal-logo .logo-title {
+    font-size: 1.05rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--brown-dark);
+    font-family: 'Georgia', serif;
+  }
+  .modal-logo .ornament {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    margin: 8px 0 0;
+    color: var(--gold);
+    font-size: .65rem;
+    letter-spacing: .2em;
+    font-family: 'Georgia', serif;
+  }
+  .ornament-line { height: 1px; width: 40px; background: var(--gold); opacity: .6; }
 
-    /* En-tête modal */
-    .modal-logo {
-      text-align: center;
-      margin-bottom: 22px;
-    }
-    .modal-logo .logo-title {
-      font-size: 1.05rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: var(--brown-dark);
-    }
-    .modal-logo .logo-subtitle {
-      font-size: .72rem;
-      letter-spacing: .18em;
-      color: var(--brown-light);
-      margin-top: 4px;
-    }
-    .modal-logo .ornament {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: center;
-      margin: 8px 0 0;
-      color: var(--gold);
-      font-size: .65rem;
-      letter-spacing: .2em;
-    }
-    .ornament-line {
-      height: 1px;
-      width: 40px;
-      background: var(--gold);
-      opacity: .6;
-    }
+  .modal-title {
+    text-align: center;
+    font-size: 1.25rem;
+    color: var(--brown-dark);
+    margin-bottom: 24px;
+    letter-spacing: .04em;
+    font-family: 'Georgia', serif;
+  }
 
-    .modal-title {
-      text-align: center;
-      font-size: 1.25rem;
-      color: var(--brown-dark);
-      margin-bottom: 24px;
-      letter-spacing: .04em;
-    }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: .75rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--brown);
+    margin-bottom: 6px;
+    font-family: 'Georgia', serif;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--brown-light);
+    border-radius: 3px;
+    background: var(--white);
+    font-family: 'Georgia', serif;
+    font-size: .9rem;
+    color: var(--brown-dark);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--brown); }
+  .form-group textarea { resize: vertical; min-height: 90px; }
 
-    /* Formulaire */
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-group label {
-      display: block;
-      font-size: .75rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--brown);
-      margin-bottom: 6px;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid var(--brown-light);
-      border-radius: 3px;
-      background: var(--white);
-      font-family: 'Georgia', serif;
-      font-size: .9rem;
-      color: var(--brown-dark);
-      outline: none;
-      transition: border-color .2s;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--brown);
-    }
-    .form-group textarea { resize: vertical; min-height: 90px; }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
 
-    .form-row { display: flex; gap: 12px; }
-    .form-row .form-group { flex: 1; }
+  .btn-submit {
+    width: 100%;
+    margin-top: 8px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--brown) 0%, var(--brown-dark) 100%);
+    color: var(--cream);
+    border: none;
+    border-radius: 3px;
+    font-family: 'Georgia', serif;
+    font-size: .9rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity .2s, transform .15s;
+  }
+  .btn-submit:hover { opacity: .9; transform: translateY(-1px); }
 
-    .btn-submit {
-      width: 100%;
-      margin-top: 8px;
-      padding: 14px;
-      background: linear-gradient(135deg, var(--brown) 0%, var(--brown-dark) 100%);
-      color: var(--cream);
-      border: none;
-      border-radius: 3px;
-      font-family: 'Georgia', serif;
-      font-size: .9rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: opacity .2s, transform .15s;
-    }
-    .btn-submit:hover { opacity: .9; transform: translateY(-1px); }
+  .modal-alt { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-alt {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 3px;
+    font-family: 'Georgia', serif;
+    font-size: .8rem;
+    letter-spacing: .05em;
+    text-decoration: none;
+    border: 1.5px solid;
+    transition: background .2s, color .2s;
+    cursor: pointer;
+  }
+  .btn-wa  { border-color: #25d366; color: #25d366; }
+  .btn-wa:hover  { background: #25d366; color: var(--white); }
+  .btn-tel { border-color: var(--brown-light); color: var(--brown); }
+  .btn-tel:hover { background: var(--brown-light); color: var(--white); }
 
-    .modal-alt {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-    }
-    .btn-alt {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px;
-      border-radius: 3px;
-      font-family: 'Georgia', serif;
-      font-size: .8rem;
-      letter-spacing: .05em;
-      text-decoration: none;
-      border: 1.5px solid;
-      transition: background .2s, color .2s;
-      cursor: pointer;
-    }
-    .btn-wa  { border-color: #25d366; color: #25d366; }
-    .btn-wa:hover  { background: #25d366; color: var(--white); }
-    .btn-tel { border-color: var(--brown-light); color: var(--brown); }
-    .btn-tel:hover { background: var(--brown-light); color: var(--white); }
+  .modal-separator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0 4px;
+    color: var(--brown-light);
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-family: 'Georgia', serif;
+  }
+  .modal-separator::before,
+  .modal-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--brown-light);
+    opacity: .5;
+  }
 
-    .modal-separator {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 18px 0 4px;
-      color: var(--brown-light);
-      font-size: .72rem;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-    .modal-separator::before,
-    .modal-separator::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--brown-light);
-      opacity: .5;
-    }
+  #form-success { display: none; text-align: center; padding: 20px 0; }
+  #form-success .checkmark { font-size: 2.4rem; color: var(--gold); margin-bottom: 12px; }
+  #form-success p { color: var(--brown-dark); font-size: .95rem; line-height: 1.6; font-family: 'Georgia', serif; }
 
-    /* Succès */
-    #form-success {
-      display: none;
-      text-align: center;
-      padding: 20px 0;
-    }
-    #form-success .checkmark {
-      font-size: 2.4rem;
-      color: var(--gold);
-      margin-bottom: 12px;
-    }
-    #form-success p {
-      color: var(--brown-dark);
-      font-size: .95rem;
-      line-height: 1.6;
-    }
+  /* ══════════════════════════════════════════
+     2. BANDEAU AVIS DÉFILANT
+  ══════════════════════════════════════════ */
 
-    /* ══════════════════════════════════════════
-       2. BANDEAU AVIS DÉFILANT
-    ══════════════════════════════════════════ */
+  #testimonials-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9998;
+    background: linear-gradient(90deg, var(--brown-dark) 0%, var(--brown) 100%);
+    padding: 0;
+    overflow: hidden;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    border-top: 2px solid rgba(255,255,255,0.35);
+  }
 
-    #testimonials-banner {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 9998;
-      background: linear-gradient(90deg, var(--brown-dark) 0%, var(--brown) 100%);
-      padding: 0;
-      overflow: hidden;
-      height: 72px;
-      display: flex;
-      align-items: center;
-      border-top: 2px solid rgba(255,255,255,0.35);
-    }
+  .banner-label {
+    flex-shrink: 0;
+    padding: 0 22px;
+    border-right: 1px solid rgba(255,255,255,.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 100%;
+  }
+  .banner-label .stars { color: var(--gold); font-size: .9rem; letter-spacing: 2px; }
+  .banner-label .label-text {
+    font-size: .62rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.7);
+    font-family: 'Georgia', serif;
+  }
 
-    /* Label fixe à gauche */
-    .banner-label {
-      flex-shrink: 0;
-      padding: 0 22px;
-      border-right: 1px solid rgba(255,255,255,.18);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      height: 100%;
-    }
-    .banner-label .stars {
-      color: var(--gold);
-      font-size: .9rem;
-      letter-spacing: 2px;
-    }
-    .banner-label .label-text {
-      font-size: .62rem;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.7);
-    }
+  .banner-track-wrap {
+    overflow: hidden;
+    flex: 1;
+    mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+  }
+  .banner-track {
+    display: flex;
+    width: max-content;
+    animation: scroll-left 40s linear infinite;
+  }
+  .banner-track:hover { animation-play-state: paused; }
 
-    /* Piste défilante */
-    .banner-track-wrap {
-      overflow: hidden;
-      flex: 1;
-      mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
-    }
-    .banner-track {
-      display: flex;
-      width: max-content;
-      animation: scroll-left 40s linear infinite;
-    }
-    .banner-track:hover { animation-play-state: paused; }
+  @keyframes scroll-left {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
 
-    @keyframes scroll-left {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
+  .testimonial-card {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 36px;
+    border-right: 1px solid rgba(255,255,255,.12);
+    height: 72px;
+    min-width: 340px;
+    max-width: 420px;
+  }
+  .t-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .t-stars { color: var(--gold); font-size: .78rem; letter-spacing: 1px; }
+  .t-name {
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+    font-family: 'Georgia', serif;
+  }
+  .t-tag {
+    font-size: .58rem;
+    letter-spacing: .12em;
+    background: rgba(255,255,255,.12);
+    color: rgba(255,255,255,.7);
+    border-radius: 20px;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    font-family: 'Georgia', serif;
+  }
+  .t-google { display: flex; align-items: center; gap: 3px; margin-left: auto; flex-shrink: 0; }
+  .t-google svg { display: block; }
+  .t-google-label {
+    font-size: .55rem;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.45);
+    text-transform: uppercase;
+    font-family: 'Georgia', serif;
+  }
+  .t-text {
+    font-size: .8rem;
+    color: rgba(255,255,255,.88);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    font-family: 'Georgia', serif;
+  }
 
-    .testimonial-card {
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 0 36px;
-      border-right: 1px solid rgba(255,255,255,.12);
-      height: 72px;
-      min-width: 340px;
-      max-width: 420px;
-    }
-    .t-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
-    .t-stars { color: var(--gold); font-size: .78rem; letter-spacing: 1px; }
-    .t-name  {
-      font-size: .7rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.55);
-    }
-    .t-tag {
-      font-size: .58rem;
-      letter-spacing: .12em;
-      background: rgba(255,255,255,.12);
-      color: rgba(255,255,255,.7);
-      border-radius: 20px;
-      padding: 2px 8px;
-      text-transform: uppercase;
-    }
-    /* Badge Google */
-    .t-google {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-    .t-google svg { display: block; }
-    .t-google-label {
-      font-size: .55rem;
-      letter-spacing: .08em;
-      color: rgba(255,255,255,.45);
-      text-transform: uppercase;
-    }
-    .t-text {
-      font-size: .8rem;
-      color: rgba(255,255,255,.88);
-      font-style: italic;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
+  #banner-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,.4);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 16px;
+    height: 100%;
+    transition: color .2s;
+  }
+  #banner-close:hover { color: rgba(255,255,255,.9); }
 
-    /* Bouton fermer le bandeau */
-    #banner-close {
-      flex-shrink: 0;
-      background: none;
-      border: none;
-      color: rgba(255,255,255,.4);
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 0 16px;
-      height: 100%;
-      transition: color .2s;
-    }
-    #banner-close:hover { color: rgba(255,255,255,.9); }
+  @media (max-width: 480px) {
+    #modal { padding: 34px 22px 28px; }
+    .form-row { flex-direction: column; gap: 0; }
+    #fab-main span { display: none; }
+    #fab-main { padding: 14px; border-radius: 50%; }
+    .testimonial-card { min-width: 280px; padding: 0 22px; }
+    .banner-label { padding: 0 14px; }
+  }
 
-    /* Décalage du bouton flottant quand le bandeau est visible */
-    /* le FAB est en haut à gauche, pas besoin de décalage pour le bandeau */
+  /* ══════════════════════════════════════════
+     3. INTRO SCREEN
+  ══════════════════════════════════════════ */
 
-    /* ── Responsive ── */
-    @media (max-width: 480px) {
-      #modal { padding: 34px 22px 28px; }
-      .form-row { flex-direction: column; gap: 0; }
-      #fab-main span { display: none; }
-      #fab-main { padding: 14px; border-radius: 50%; }
-      .testimonial-card { min-width: 280px; padding: 0 22px; }
-      .banner-label { padding: 0 14px; }
-    }
+  #intro {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    /* ══════════════════════════════════════════
-       3. INTRO SCREEN
-    ══════════════════════════════════════════ */
+  #intro-bg {
+    position: absolute;
+    inset: -8%;
+    background-image: url('https://cdn0.mariages.net/vendor/1157/3_2/960/jpg/vm1158-16-original_3_361157-172708480422168.jpeg');
+    background-size: cover;
+    background-position: center 40%;
+    animation: kenburns 18s ease-in-out infinite alternate;
+    will-change: transform;
+  }
 
-    #intro {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  @keyframes kenburns {
+    0%   { transform: scale(1)    translate(0%,  0%); }
+    33%  { transform: scale(1.08) translate(-1.5%, 1%); }
+    66%  { transform: scale(1.13) translate(1%,  -1.5%); }
+    100% { transform: scale(1.18) translate(-0.5%, 0.5%); }
+  }
 
-    /* Photo de fond avec effet Ken Burns (zoom lent simulant un drone) */
-    #intro-bg {
-      position: absolute;
-      inset: -8%;          /* légèrement plus grand pour que le zoom ne révèle pas les bords */
-      background-image: url('https://cdn0.mariages.net/vendor/1157/3_2/960/jpg/vm1158-16-original_3_361157-172708480422168.jpeg');
-      background-size: cover;
-      background-position: center 40%;
-      animation: kenburns 18s ease-in-out infinite alternate;
-      will-change: transform;
-    }
+  #intro-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      rgba(10,7,4,.68) 0%,
+      rgba(30,20,10,.55) 50%,
+      rgba(10,7,4,.72) 100%
+    );
+  }
 
-    @keyframes kenburns {
-      0%   { transform: scale(1)    translate(0%,  0%); }
-      33%  { transform: scale(1.08) translate(-1.5%, 1%); }
-      66%  { transform: scale(1.13) translate(1%,  -1.5%); }
-      100% { transform: scale(1.18) translate(-0.5%, 0.5%); }
-    }
+  #intro-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+    padding: 60px 48px;
+    max-width: 720px;
+    width: 100%;
+    animation: fadeInUp 1.4s ease both;
+  }
 
-    /* Voile sombre élégant sur la photo */
-    #intro-veil {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        160deg,
-        rgba(10, 7, 4, 0.68) 0%,
-        rgba(30, 20, 10, 0.55) 50%,
-        rgba(10, 7, 4, 0.72) 100%
-      );
-    }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-    /* Contenu centré */
-    #intro-content {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 0;
-      padding: 60px 48px;
-      max-width: 720px;
-      width: 100%;
-      animation: fadeInUp 1.4s ease both;
-    }
+  .intro-eyebrow {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: .72rem;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+    opacity: .9;
+  }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+  .intro-title {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: normal;
+    color: var(--white);
+    line-height: 1.18;
+    letter-spacing: .03em;
+    margin-bottom: 8px;
+  }
 
-    /* Petit surtitre */
-    .intro-eyebrow {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: .72rem;
-      letter-spacing: .32em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 28px;
-      opacity: .9;
-    }
+  .intro-subtitle {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: clamp(.95rem, 2.2vw, 1.2rem);
+    font-style: italic;
+    font-weight: normal;
+    color: rgba(255,255,255,.72);
+    letter-spacing: .02em;
+    margin-bottom: 44px;
+    line-height: 1.6;
+    max-width: 520px;
+  }
 
-    /* Titre principal */
-    .intro-title {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: normal;
-      color: var(--white);
-      line-height: 1.18;
-      letter-spacing: .03em;
-      margin-bottom: 8px;
-    }
+  .intro-ornament {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 44px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .intro-ornament-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: .6;
+  }
+  .intro-ornament-diamond { color: var(--gold); font-size: .7rem; opacity: .8; letter-spacing: 4px; }
 
-    /* Sous-titre cursif / italic */
-    .intro-subtitle {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: clamp(.95rem, 2.2vw, 1.2rem);
-      font-style: italic;
-      font-weight: normal;
-      color: rgba(255,255,255,.72);
-      letter-spacing: .02em;
-      margin-bottom: 44px;
-      line-height: 1.6;
-      max-width: 520px;
-    }
+  #intro-btn {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: .88rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,.5);
+    border-radius: 2px;
+    padding: 18px 52px;
+    cursor: pointer;
+    transition: background .35s, border-color .35s, color .35s;
+    position: relative;
+    overflow: hidden;
+  }
+  #intro-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(201,169,110,.18);
+    opacity: 0;
+    transition: opacity .35s;
+  }
+  #intro-btn:hover { border-color: var(--gold); }
+  #intro-btn:hover::before { opacity: 1; }
 
-    /* Séparateur doré */
-    .intro-ornament {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 44px;
-      width: 100%;
-      max-width: 360px;
-    }
-    .intro-ornament-line {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      opacity: .6;
-    }
-    .intro-ornament-diamond {
-      color: var(--gold);
-      font-size: .7rem;
-      opacity: .8;
-      letter-spacing: 4px;
-    }
+  .intro-location {
+    margin-top: 36px;
+    font-family: 'Georgia', serif;
+    font-size: .65rem;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.38);
+  }
 
-    /* Bouton Commencer */
-    #intro-btn {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: .88rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: var(--white);
-      background: transparent;
-      border: 1.5px solid rgba(255,255,255,.5);
-      border-radius: 2px;
-      padding: 18px 52px;
-      cursor: pointer;
-      transition: background .35s, border-color .35s, color .35s;
-      position: relative;
-      overflow: hidden;
-    }
-    #intro-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(201,169,110,.18);
-      opacity: 0;
-      transition: opacity .35s;
-    }
-    #intro-btn:hover { border-color: var(--gold); }
-    #intro-btn:hover::before { opacity: 1; }
+  #intro.hide { animation: fadeOut .85s ease both; }
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+</style>
 
-    /* Localisation */
-    .intro-location {
-      margin-top: 36px;
-      font-family: 'Georgia', serif;
-      font-size: .65rem;
-      letter-spacing: .28em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.38);
-    }
-
-    /* Animation de sortie */
-    #intro.hide {
-      animation: fadeOut .85s ease both;
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to   { opacity: 0; }
-    }
-  </style>
-</head>
-<body class="banner-visible">
-
-  <!-- ══════════════════════════════════════════
-       INTRO SCREEN
-  ══════════════════════════════════════════ -->
-  <div id="intro">
-    <div id="intro-bg"></div>
-    <div id="intro-veil"></div>
-
-    <div id="intro-content">
-      <p class="intro-eyebrow">Port-sur-Seille · Lorraine</p>
-
-      <h1 class="intro-title">Domaine de Dombasle</h1>
-      <p class="intro-subtitle">Un écrin d'exception pour vos mariages,<br>séminaires et réceptions privées.</p>
-
-      <div class="intro-ornament">
-        <span class="intro-ornament-line"></span>
-        <span class="intro-ornament-diamond">✦</span>
-        <span class="intro-ornament-line"></span>
-      </div>
-
-      <button id="intro-btn" onclick="startVisit()">Commencer la visite</button>
-
-      <p class="intro-location">Domaine privé · Location événementielle</p>
+<!-- ══════════════════════════════════════════
+     INTRO SCREEN
+══════════════════════════════════════════ -->
+<div id="intro">
+  <div id="intro-bg"></div>
+  <div id="intro-veil"></div>
+  <div id="intro-content">
+    <p class="intro-eyebrow">Port-sur-Seille · Lorraine</p>
+    <h1 class="intro-title">Domaine de Dombasle</h1>
+    <p class="intro-subtitle">Un écrin d'exception pour vos mariages,<br>séminaires et réceptions privées.</p>
+    <div class="intro-ornament">
+      <span class="intro-ornament-line"></span>
+      <span class="intro-ornament-diamond">✦</span>
+      <span class="intro-ornament-line"></span>
     </div>
+    <button id="intro-btn" onclick="startVisit()">Commencer la visite</button>
+    <p class="intro-location">Domaine privé · Location événementielle</p>
   </div>
+</div>
 
-  <!-- ══════════════════════════════════════════
-       BOUTON FLOTTANT
-  ══════════════════════════════════════════ -->
-  <div id="fab">
-    <!-- Actions rapides -->
-    <div id="fab-quick">
-      <a class="fab-action" href="https://wa.me/33636118631?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20le%20Domaine%20de%20Dombasle." target="_blank" rel="noopener">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp
-      </a>
-      <div class="fab-divider">— ou —</div>
-      <a class="fab-action" href="tel:+33636118631">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.19 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
-        Appeler
-      </a>
-      <div class="fab-divider">— ou —</div>
-      <button class="fab-action" onclick="openModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Formulaire de devis
-      </button>
-    </div>
-
-    <!-- Bouton principal -->
-    <button id="fab-main" onclick="toggleFab()">
-      <svg class="icon-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      <svg class="icon-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      <span>Demander un devis</span>
+<!-- ══════════════════════════════════════════
+     BOUTON FLOTTANT
+══════════════════════════════════════════ -->
+<div id="fab">
+  <div id="fab-quick">
+    <a class="fab-action" href="https://wa.me/33636118631?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20le%20Domaine%20de%20Dombasle." target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <div class="fab-divider">— ou —</div>
+    <a class="fab-action" href="tel:+33636118631">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7a6552" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.19 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+      Appeler
+    </a>
+    <div class="fab-divider">— ou —</div>
+    <button class="fab-action" onclick="openModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7a6552" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Formulaire de devis
     </button>
   </div>
+  <button id="fab-main" onclick="toggleFab()">
+    <svg class="icon-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <svg class="icon-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <span>Demander un devis</span>
+  </button>
+</div>
 
-  <!-- ══════════════════════════════════════════
-       MODAL FORMULAIRE
-  ══════════════════════════════════════════ -->
-  <div id="modal-overlay" onclick="closeModalOverlay(event)">
-    <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
-      <button id="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
-
-      <!-- Logo textuel -->
-      <div class="modal-logo">
-        <div class="logo-title">Domaine de Dombasle</div>
-        <div class="ornament">
-          <span class="ornament-line"></span>
-          Port-sur-Seille
-          <span class="ornament-line"></span>
-        </div>
-      </div>
-
-      <h2 class="modal-title" id="modal-heading">Demande de devis</h2>
-
-      <!-- Formulaire -->
-      <form id="devis-form" onsubmit="submitForm(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="prenom">Prénom</label>
-            <input type="text" id="prenom" name="prenom" placeholder="Marie" required />
-          </div>
-          <div class="form-group">
-            <label for="nom">Nom</label>
-            <input type="text" id="nom" name="nom" placeholder="Dupont" required />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="marie@exemple.fr" required />
-        </div>
-
-        <div class="form-group">
-          <label for="telephone">Téléphone</label>
-          <input type="tel" id="telephone" name="telephone" placeholder="+33 6 XX XX XX XX" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="event-type">Type d'événement</label>
-            <select id="event-type" name="event-type" required>
-              <option value="" disabled selected>Choisir…</option>
-              <option>Mariage</option>
-              <option>Séminaire / Entreprise</option>
-              <option>Anniversaire</option>
-              <option>Autre</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="date">Date souhaitée</label>
-            <input type="date" id="date" name="date" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="guests">Nombre d'invités</label>
-          <input type="number" id="guests" name="guests" placeholder="Ex. 80" min="1" />
-        </div>
-
-        <div class="form-group">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" placeholder="Décrivez votre projet…"></textarea>
-        </div>
-
-        <button type="submit" class="btn-submit">Envoyer ma demande</button>
-      </form>
-
-      <!-- Message succès -->
-      <div id="form-success">
-        <div class="checkmark">✦</div>
-        <p>Merci pour votre demande.<br>Nous vous recontacterons dans les 24 h.</p>
-      </div>
-
-      <!-- Contact direct -->
-      <div class="modal-separator">Contact direct</div>
-      <div class="modal-alt">
-        <!-- Modifier le numéro WhatsApp ici -->
-        <a class="btn-alt btn-wa" href="https://wa.me/33636118631?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20le%20Domaine%20de%20Dombasle." target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          WhatsApp
-        </a>
-        <!-- Modifier le numéro ici -->
-        <a class="btn-alt btn-tel" href="tel:+33636118631">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.19 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
-          Appeler
-        </a>
+<!-- ══════════════════════════════════════════
+     MODAL FORMULAIRE
+══════════════════════════════════════════ -->
+<div id="modal-overlay" onclick="closeModalOverlay(event)">
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+    <button id="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+    <div class="modal-logo">
+      <div class="logo-title">Domaine de Dombasle</div>
+      <div class="ornament">
+        <span class="ornament-line"></span>
+        Port-sur-Seille
+        <span class="ornament-line"></span>
       </div>
     </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       BANDEAU AVIS DÉFILANT
-  ══════════════════════════════════════════ -->
-  <div id="testimonials-banner">
-    <!-- Label Note globale -->
-    <div class="banner-label">
-      <div class="stars">★★★★★</div>
-      <div class="label-text">Avis clients</div>
+    <h2 class="modal-title" id="modal-heading">Demande de devis</h2>
+    <form id="devis-form" onsubmit="submitForm(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="prenom">Prénom</label>
+          <input type="text" id="prenom" name="prenom" placeholder="Marie" required />
+        </div>
+        <div class="form-group">
+          <label for="nom">Nom</label>
+          <input type="text" id="nom" name="nom" placeholder="Dupont" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="marie@exemple.fr" required />
+      </div>
+      <div class="form-group">
+        <label for="telephone">Téléphone</label>
+        <input type="tel" id="telephone" name="telephone" placeholder="+33 6 XX XX XX XX" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="event-type">Type d'événement</label>
+          <select id="event-type" name="event-type" required>
+            <option value="" disabled selected>Choisir…</option>
+            <option>Mariage</option>
+            <option>Séminaire / Entreprise</option>
+            <option>Anniversaire</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="date">Date souhaitée</label>
+          <input type="date" id="date" name="date" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="guests">Nombre d'invités</label>
+        <input type="number" id="guests" name="guests" placeholder="Ex. 80" min="1" />
+      </div>
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Décrivez votre projet…"></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Envoyer ma demande</button>
+    </form>
+    <div id="form-success">
+      <div class="checkmark">✦</div>
+      <p>Merci pour votre demande.<br>Nous vous recontacterons dans les 24 h.</p>
     </div>
-
-    <!-- Piste défilante (les cartes sont doublées pour un scroll infini fluide) -->
-    <div class="banner-track-wrap">
-      <div class="banner-track" id="banner-track">
-
-        <!-- ── Avis Google réels ── -->
-        <div class="testimonial-card">
-          <div class="t-header">
-            <span class="t-stars">★★★★★</span>
-            <span class="t-name">Elisa Rappenne</span>
-            <span class="t-tag">Mariage</span>
-            <span class="t-google">
-              <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              <span class="t-google-label">Google</span>
-            </span>
-          </div>
-          <p class="t-text">« Le lieu et le parc sont superbes. Mélanie est d'un grand professionnalisme, rien n'est laissé au hasard. »</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <span class="t-stars">★★★★★</span>
-            <span class="t-name">Julien Toussaint</span>
-            <span class="t-tag">Mariage</span>
-            <span class="t-google">
-              <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              <span class="t-google-label">Google</span>
-            </span>
-          </div>
-          <p class="t-text">« Très beau domaine. Les propriétaires sont accueillants, gentils et professionnels. Un lieu qui a un bel avenir. »</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <span class="t-stars">★★★★★</span>
-            <span class="t-name">Mathieu P.</span>
-            <span class="t-tag">Événement pro</span>
-            <span class="t-google">
-              <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              <span class="t-google-label">Google</span>
-            </span>
-          </div>
-          <p class="t-text">« Cadre parfait et dépaysant. Mélanie et Yannick toujours aux petits soins, les petits détails font la différence ! »</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <span class="t-stars">★★★★★</span>
-            <span class="t-name">Brigitte SF</span>
-            <span class="t-tag">Fête familiale</span>
-            <span class="t-google">
-              <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              <span class="t-google-label">Google</span>
-            </span>
-          </div>
-          <p class="t-text">« Un lieu enchanteur, rénové avec goût. Mélanie nous a entourés avec une convivialité attentionnée. Merci ! »</p>
-        </div>
-
-        <!-- ── Doublage pour scroll infini ── -->
-        <div class="testimonial-card">
-          <div class="t-header">
-            <span class="t-stars">★★★★★</span>
-            <span class="t-name">Elisa Rappenne</span>
-            <span class="t-tag">Mariage</span>
-            <span class="t-google">
-              <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              <span class="t-google-label">Google</span>
-            </span>
-          </div>
-          <p class="t-text">« Le lieu et le parc sont superbes. Mélanie est d'un grand professionnalisme, rien n'est laissé au hasard. »</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <span class="t-stars">★★★★★</span>
-            <span class="t-name">Julien Toussaint</span>
-            <span class="t-tag">Mariage</span>
-            <span class="t-google">
-              <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              <span class="t-google-label">Google</span>
-            </span>
-          </div>
-          <p class="t-text">« Très beau domaine. Les propriétaires sont accueillants, gentils et professionnels. Un lieu qui a un bel avenir. »</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <span class="t-stars">★★★★★</span>
-            <span class="t-name">Mathieu P.</span>
-            <span class="t-tag">Événement pro</span>
-            <span class="t-google">
-              <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              <span class="t-google-label">Google</span>
-            </span>
-          </div>
-          <p class="t-text">« Cadre parfait et dépaysant. Mélanie et Yannick toujours aux petits soins, les petits détails font la différence ! »</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <span class="t-stars">★★★★★</span>
-            <span class="t-name">Brigitte SF</span>
-            <span class="t-tag">Fête familiale</span>
-            <span class="t-google">
-              <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              <span class="t-google-label">Google</span>
-            </span>
-          </div>
-          <p class="t-text">« Un lieu enchanteur, rénové avec goût. Mélanie nous a entourés avec une convivialité attentionnée. Merci ! »</p>
-        </div>
-
-      </div><!-- /banner-track -->
-    </div><!-- /banner-track-wrap -->
-
-    <button id="banner-close" onclick="closeBanner()" title="Fermer">×</button>
+    <div class="modal-separator">Contact direct</div>
+    <div class="modal-alt">
+      <a class="btn-alt btn-wa" href="https://wa.me/33636118631?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20le%20Domaine%20de%20Dombasle." target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+      <a class="btn-alt btn-tel" href="tel:+33636118631">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.19 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+        Appeler
+      </a>
+    </div>
   </div>
+</div>
 
-  <!-- ══════════════════════════════════════════
-       JAVASCRIPT
-  ══════════════════════════════════════════ -->
-  <script>
-    /* ── Intro screen ── */
-    function startVisit() {
-      const intro = document.getElementById('intro');
-      intro.classList.add('hide');
-      setTimeout(() => { intro.style.display = 'none'; }, 900);
-    }
+<!-- ══════════════════════════════════════════
+     BANDEAU AVIS DÉFILANT
+══════════════════════════════════════════ -->
+<div id="testimonials-banner">
+  <div class="banner-label">
+    <div class="stars">★★★★★</div>
+    <div class="label-text">Avis clients</div>
+  </div>
+  <div class="banner-track-wrap">
+    <div class="banner-track">
 
-    /* ── FAB ── */
-    function toggleFab() {
-      const btn   = document.getElementById('fab-main');
-      const quick = document.getElementById('fab-quick');
-      btn.classList.toggle('open');
-      quick.classList.toggle('open');
-    }
+      <div class="testimonial-card">
+        <div class="t-header">
+          <span class="t-stars">★★★★★</span>
+          <span class="t-name">Elisa Rappenne</span>
+          <span class="t-tag">Mariage</span>
+          <span class="t-google">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="t-google-label">Google</span>
+          </span>
+        </div>
+        <p class="t-text">« Le lieu et le parc sont superbes. Mélanie est d'un grand professionnalisme, rien n'est laissé au hasard. »</p>
+      </div>
 
-    /* ── Modal ── */
-    function openModal() {
-      document.getElementById('modal-overlay').classList.add('open');
-      document.body.style.overflow = 'hidden';
-      // Fermer le menu rapide
-      document.getElementById('fab-main').classList.remove('open');
-      document.getElementById('fab-quick').classList.remove('open');
-    }
-    function closeModal() {
-      document.getElementById('modal-overlay').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    function closeModalOverlay(e) {
-      if (e.target === document.getElementById('modal-overlay')) closeModal();
-    }
+      <div class="testimonial-card">
+        <div class="t-header">
+          <span class="t-stars">★★★★★</span>
+          <span class="t-name">Julien Toussaint</span>
+          <span class="t-tag">Mariage</span>
+          <span class="t-google">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="t-google-label">Google</span>
+          </span>
+        </div>
+        <p class="t-text">« Très beau domaine. Les propriétaires sont accueillants, gentils et professionnels. Un lieu qui a un bel avenir. »</p>
+      </div>
 
-    /* Fermer avec Echap */
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+      <div class="testimonial-card">
+        <div class="t-header">
+          <span class="t-stars">★★★★★</span>
+          <span class="t-name">Mathieu P.</span>
+          <span class="t-tag">Événement pro</span>
+          <span class="t-google">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="t-google-label">Google</span>
+          </span>
+        </div>
+        <p class="t-text">« Cadre parfait et dépaysant. Mélanie et Yannick toujours aux petits soins, les petits détails font la différence ! »</p>
+      </div>
 
-    /* ── Formulaire ── */
-    function submitForm(e) {
-      e.preventDefault();
-      /*
-        Ici vous pouvez envoyer les données à votre backend / Formspree / EmailJS.
-        Exemple Formspree : remplacer l'action du form par https://formspree.io/f/VOTRE_ID
+      <div class="testimonial-card">
+        <div class="t-header">
+          <span class="t-stars">★★★★★</span>
+          <span class="t-name">Brigitte SF</span>
+          <span class="t-tag">Fête familiale</span>
+          <span class="t-google">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="t-google-label">Google</span>
+          </span>
+        </div>
+        <p class="t-text">« Un lieu enchanteur, rénové avec goût. Mélanie nous a entourés avec une convivialité attentionnée. Merci ! »</p>
+      </div>
 
-        Pour l'instant : simulation d'envoi réussi.
-      */
-      document.getElementById('devis-form').style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
-      setTimeout(() => {
-        closeModal();
-        document.getElementById('devis-form').style.display = 'block';
-        document.getElementById('form-success').style.display = 'none';
-        document.getElementById('devis-form').reset();
-      }, 4000);
-    }
+      <!-- Doublage pour scroll infini -->
+      <div class="testimonial-card">
+        <div class="t-header">
+          <span class="t-stars">★★★★★</span>
+          <span class="t-name">Elisa Rappenne</span>
+          <span class="t-tag">Mariage</span>
+          <span class="t-google">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="t-google-label">Google</span>
+          </span>
+        </div>
+        <p class="t-text">« Le lieu et le parc sont superbes. Mélanie est d'un grand professionnalisme, rien n'est laissé au hasard. »</p>
+      </div>
 
-    /* ── Bandeau ── */
-    function closeBanner() {
-      document.getElementById('testimonials-banner').style.display = 'none';
-      document.body.classList.remove('banner-visible');
-    }
-  </script>
+      <div class="testimonial-card">
+        <div class="t-header">
+          <span class="t-stars">★★★★★</span>
+          <span class="t-name">Julien Toussaint</span>
+          <span class="t-tag">Mariage</span>
+          <span class="t-google">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="t-google-label">Google</span>
+          </span>
+        </div>
+        <p class="t-text">« Très beau domaine. Les propriétaires sont accueillants, gentils et professionnels. Un lieu qui a un bel avenir. »</p>
+      </div>
 
-</body>
-</html>
+      <div class="testimonial-card">
+        <div class="t-header">
+          <span class="t-stars">★★★★★</span>
+          <span class="t-name">Mathieu P.</span>
+          <span class="t-tag">Événement pro</span>
+          <span class="t-google">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="t-google-label">Google</span>
+          </span>
+        </div>
+        <p class="t-text">« Cadre parfait et dépaysant. Mélanie et Yannick toujours aux petits soins, les petits détails font la différence ! »</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="t-header">
+          <span class="t-stars">★★★★★</span>
+          <span class="t-name">Brigitte SF</span>
+          <span class="t-tag">Fête familiale</span>
+          <span class="t-google">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            <span class="t-google-label">Google</span>
+          </span>
+        </div>
+        <p class="t-text">« Un lieu enchanteur, rénové avec goût. Mélanie nous a entourés avec une convivialité attentionnée. Merci ! »</p>
+      </div>
+
+    </div>
+  </div>
+  <button id="banner-close" onclick="closeBanner()" title="Fermer">×</button>
+</div>
+
+<script>
+  function startVisit() {
+    var intro = document.getElementById('intro');
+    intro.classList.add('hide');
+    setTimeout(function() { intro.style.display = 'none'; }, 900);
+  }
+
+  function toggleFab() {
+    var btn   = document.getElementById('fab-main');
+    var quick = document.getElementById('fab-quick');
+    btn.classList.toggle('open');
+    quick.classList.toggle('open');
+  }
+
+  function openModal() {
+    document.getElementById('modal-overlay').classList.add('open');
+    document.getElementById('fab-main').classList.remove('open');
+    document.getElementById('fab-quick').classList.remove('open');
+  }
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+  function closeModalOverlay(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+  function submitForm(e) {
+    e.preventDefault();
+    document.getElementById('devis-form').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+    setTimeout(function() {
+      closeModal();
+      document.getElementById('devis-form').style.display = 'block';
+      document.getElementById('form-success').style.display = 'none';
+      document.getElementById('devis-form').reset();
+    }, 4000);
+  }
+
+  function closeBanner() {
+    document.getElementById('testimonials-banner').style.display = 'none';
+  }
+</script>
