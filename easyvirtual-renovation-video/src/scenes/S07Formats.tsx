@@ -5,6 +5,7 @@ import { Mascot } from "../components/Mascot";
 import { Check, Grid, KeyPhrase } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
+import { Stage, useV } from "../layout";
 
 const S = scene("formats");
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -43,6 +44,7 @@ const Doc: React.FC<{ ext: string; sub: string; bg: string; fg: string }> = ({ e
 
 export const S07Formats: React.FC = () => {
   const frame = useCurrentFrame();
+  const v = useV();
   const fileCues = [cue(S, "DWG"), cue(S, "PDF"), cue(S, "IFC"), cue(S, "RVT")];
   const softCues = [cue(S, "Revit"), cue(S, "ArchiCAD"), cue(S, "AutoCAD"), cue(S, "SketchUp")];
   const cOpen = cue(S, "s'ouvrent");
@@ -59,6 +61,7 @@ export const S07Formats: React.FC = () => {
       <AbsoluteFill style={{ opacity: 1 - exit }}>
         {/* ---------- partie A : formats → logiciels ---------- */}
         <AbsoluteFill style={{ translate: `0 ${-partOut * 140}px`, opacity: 1 - partOut }}>
+          <Stage focus={{ x: 170, y: 200, w: 1580, h: 780 }} region={{ y: 560, h: 760 }}>
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
             {LINKS.map(([f, s], i) => {
               const t = prog(frame, softCues[s] - 6 + (i % 2) * 3, softCues[s] + 10 + (i % 2) * 3, EASE_IN_OUT);
@@ -159,10 +162,12 @@ export const S07Formats: React.FC = () => {
           >
             Directement dans vos logiciels
           </div>
+          </Stage>
         </AbsoluteFill>
 
         {/* ---------- partie B : phrases clés ---------- */}
         {/* croquis d'architecte qui se dessine en fond */}
+        <Stage focus={{ x: 540, y: 480, w: 1260, h: 540 }} region={{ y: 1100, h: 540 }}>
         <svg width={1920} height={1080} viewBox="0 -40 1920 1080" style={{ position: "absolute", inset: 0, opacity: 0.9 }}>
           {[
             "M560 900 C 760 900 820 800 1000 800 S 1200 900 1360 840 S 1600 760 1760 800",
@@ -185,26 +190,27 @@ export const S07Formats: React.FC = () => {
             />
           ))}
         </svg>
+        </Stage>
         <div
           style={{
             position: "absolute",
-            left: 0,
-            right: 0,
-            top: interpolate(p2t, [0, 1], [400, 270]),
+            left: v ? 50 : 0,
+            right: v ? 50 : 0,
+            top: v ? interpolate(p2t, [0, 1], [560, 400]) : interpolate(p2t, [0, 1], [400, 270]),
             display: "flex",
             justifyContent: "center",
             scale: `${interpolate(p2t, [0, 1], [1, 0.72])}`,
             opacity: interpolate(p2t, [0, 1], [1, 0.45]),
           }}
         >
-          <KeyPhrase phrase={p1} size={128} align="center" strike={{ word: "remodélisez", at: p1.end - 2 }} />
+          <KeyPhrase phrase={p1} size={v ? 100 : 128} align="center" strike={{ word: "remodélisez", at: p1.end - 2 }} />
         </div>
-        <div style={{ position: "absolute", left: 0, right: 0, top: 410, display: "flex", justifyContent: "center" }}>
-          <KeyPhrase phrase={p2} size={196} align="center" />
+        <div style={{ position: "absolute", left: v ? 40 : 0, right: v ? 40 : 0, top: v ? 640 : 410, display: "flex", justifyContent: "center" }}>
+          <KeyPhrase phrase={p2} size={v ? 170 : 196} align="center" />
         </div>
         {/* mascotte */}
-        <div style={{ position: "absolute", left: 180, top: 1080 - 420 * pop(frame, p2.start + 6, 11, 130) }}>
-          <Mascot height={400} mood="wink" thumbsUp={prog(frame, p2.start + 14, p2.start + 24)} look={[0.5, -0.2]} seed={7} />
+        <div style={{ position: "absolute", left: v ? 70 : 180, top: v ? 1920 - 610 * pop(frame, p2.start + 6, 11, 130) : 1080 - 420 * pop(frame, p2.start + 6, 11, 130) }}>
+          <Mascot height={v ? 340 : 400} mood="wink" thumbsUp={prog(frame, p2.start + 14, p2.start + 24)} look={[0.5, -0.2]} seed={7} />
         </div>
       </AbsoluteFill>
     </AbsoluteFill>

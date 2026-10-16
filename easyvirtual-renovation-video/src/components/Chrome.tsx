@@ -1,5 +1,6 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
+import { useV } from "../layout";
 import { EASE_IN_OUT, prog } from "../anim";
 import { SCENES } from "../timeline";
 import { C, F } from "../theme";
@@ -7,6 +8,7 @@ import { C, F } from "../theme";
 /** En-tête façon plaquette : marque à gauche, section à droite, filet. */
 export const Chrome: React.FC = () => {
   const frame = useCurrentFrame();
+  const v = useV();
   const i = SCENES.findIndex((s) => frame >= s.from && frame < s.from + s.dur);
   if (i < 0) return null;
   const s = SCENES[i];
@@ -22,23 +24,23 @@ export const Chrome: React.FC = () => {
     <div
       style={{
         position: "absolute",
-        left: 120,
-        right: 120,
-        top: 64,
+        left: v ? 70 : 120,
+        right: v ? 70 : 120,
+        top: v ? 150 : 64,
         height: 40,
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         fontFamily: F.body,
         fontWeight: 700,
-        fontSize: 19,
-        letterSpacing: "0.2em",
+        fontSize: v ? 16 : 19,
+        letterSpacing: v ? "0.16em" : "0.2em",
         textTransform: "uppercase",
         color: "#4A4A4A",
         opacity: vis,
       }}
     >
-      <div style={{ translate: `${interpolate(vis, [0, 1], [-20, 0])}px 0` }}>easyVirtual.tours — Rénovation · BIM · Plans</div>
+      <div style={{ translate: `${interpolate(vis, [0, 1], [-20, 0])}px 0` }}>{v ? "easyVirtual.tours — Rénovation" : "easyVirtual.tours — Rénovation · BIM · Plans"}</div>
       <div style={{ display: "flex", gap: 18, alignItems: "center", translate: `${interpolate(vis, [0, 1], [20, 0])}px 0` }}>
         <span style={{ color: C.orange }}>{String(sectionIndex).padStart(2, "0")}</span>
         <span>{s.section}</span>

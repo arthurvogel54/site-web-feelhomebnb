@@ -5,6 +5,7 @@ import { EASE_IN, EASE_IN_OUT, EASE_OUT, lerp, pop, prog } from "../anim";
 import { Card, Chip, Grid, KeyPhrase, useEnter } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
+import { Stage, useV } from "../layout";
 import { CameraRig, HouseModel, LaserFan, Lights, PointCloud, ScannerBot, useBearTexture } from "../three/House3D";
 import { getCloud, STATIONS } from "../three/houseData";
 
@@ -20,6 +21,7 @@ export const stationTimes = STATIONS.map((_, i) => Math.round(START + i * PER));
 
 export const S04Scan: React.FC = () => {
   const frame = useCurrentFrame();
+  const v = useV();
   const bearTex = useBearTexture();
   const W = 1920;
   const H = 1080;
@@ -80,6 +82,7 @@ export const S04Scan: React.FC = () => {
     <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Grid opacity={0.5} />
       <AbsoluteFill style={{ opacity: 1 - exit, scale: `${1 + exit * 0.04}` }}>
+        <Stage focus={{ x: 260, y: 60, w: 1300, h: 840 }} region={{ y: 360, h: 760 }}>
         {bearTex && <ThreeCanvas width={W} height={H} flat style={{ position: "absolute", inset: 0 }}>
           <CameraRig pos={camPos} target={tgt} fov={34} />
           <Lights />
@@ -88,9 +91,10 @@ export const S04Scan: React.FC = () => {
           {!scanDone && <LaserFan position={botPos} angle={rotY - Math.PI / 2} opacity={scanning} reach={4.5} />}
           <ScannerBot position={botPos} faceY={Math.atan2(camPos[0] - botPos[0], camPos[2] - botPos[2])} spin={rotY} tex={bearTex} scanning={scanning} hop={hop} scale={lerp(1, 1.25, pull)} />
         </ThreeCanvas>}
+        </Stage>
 
         {/* puces techniques */}
-        <div style={{ position: "absolute", left: 130, top: 160, display: "flex", gap: 16 }}>
+        <div style={{ position: "absolute", left: v ? 70 : 130, top: v ? 240 : 160, width: v ? 940 : undefined, display: "flex", flexWrap: "wrap", gap: 16 }}>
           <div style={chip1.style}>
             <Chip size={30} bg={C.orange}>
               <span style={{ fontFamily: F.title, fontWeight: 800 }}>360°</span> Caméra immersive
@@ -110,7 +114,7 @@ export const S04Scan: React.FC = () => {
         </div>
 
         {/* panneau de progression */}
-        <div style={{ position: "absolute", right: 120, top: 160, width: 400, ...panel.style }}>
+        <div style={{ position: "absolute", ...(v ? { left: 70, top: 1100 } : { right: 120, top: 160 }), width: 400, ...panel.style }}>
           <Card style={{ padding: 30 }}>
             <div style={{ fontFamily: F.body, fontWeight: 700, fontSize: 17, letterSpacing: "0.18em", color: C.greyText, textTransform: "uppercase" }}>Points capturés</div>
             <div style={{ fontFamily: F.title, fontWeight: 800, fontSize: 60, color: C.ink, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>
@@ -129,7 +133,7 @@ export const S04Scan: React.FC = () => {
         </div>
 
         {/* phrase clé + chrono */}
-        <div style={{ position: "absolute", left: 130, bottom: 120, display: "flex", alignItems: "center", gap: 40 }}>
+        <div style={{ position: "absolute", left: v ? 70 : 130, ...(v ? { top: 1410, width: 960 } : { bottom: 120 }), display: "flex", alignItems: "center", gap: v ? 30 : 40 }}>
           {(() => {
             const s = pop(frame, ph.start - 22, 13, 160);
             return (
@@ -156,7 +160,7 @@ export const S04Scan: React.FC = () => {
               </div>
             );
           })()}
-          <KeyPhrase phrase={ph} size={120} />
+          <KeyPhrase phrase={ph} size={v ? 104 : 120} maxWidth={v ? 760 : undefined} />
         </div>
       </AbsoluteFill>
     </AbsoluteFill>

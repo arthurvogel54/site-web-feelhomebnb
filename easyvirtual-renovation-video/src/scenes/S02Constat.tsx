@@ -5,6 +5,7 @@ import { Mascot } from "../components/Mascot";
 import { Card, Chip, Grid, KeyPhrase } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
+import { Stage, TextBlock, useV } from "../layout";
 
 const S = scene("constat");
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -27,6 +28,7 @@ const SKETCH = [
 
 export const S02Constat: React.FC = () => {
   const frame = useCurrentFrame();
+  const v = useV();
   const c6 = cue(S, "6");
   const cReleve = cue(S, "relèvent");
   const cTele = cue(S, "Télémètre");
@@ -64,9 +66,9 @@ export const S02Constat: React.FC = () => {
       <Grid opacity={0.6} drift={0.2} />
 
       {/* ---------------- Colonne gauche ---------------- */}
-      <div style={{ position: "absolute", left: 130, top: 250, width: 820 }}>
-        <KeyPhrase phrase={S.phrases[0]} size={112} exitAt={exitLeft} />
-        <KeyPhrase phrase={S.phrases[1]} size={112} exitAt={exitLeft + 3} marker />
+      <TextBlock h={{ left: 130, top: 250, width: 820 }} v={{ top: 250 }}>
+        <KeyPhrase phrase={S.phrases[0]} size={v ? 92 : 112} exitAt={exitLeft} />
+        <KeyPhrase phrase={S.phrases[1]} size={v ? 92 : 112} exitAt={exitLeft + 3} marker />
         {/* pictogrammes */}
         <div style={{ display: "flex", gap: 22, marginTop: 64 }}>
           {Array.from({ length: 10 }).map((_, i) => {
@@ -89,9 +91,9 @@ export const S02Constat: React.FC = () => {
             );
           })}
         </div>
-      </div>
+      </TextBlock>
       {/* phrase 3 */}
-      <div style={{ position: "absolute", left: 130, top: 330, width: 760 }}>
+      <TextBlock h={{ left: 130, top: 330, width: 760 }} v={{ top: 300 }}>
         <div
           style={{
             fontFamily: F.title,
@@ -106,8 +108,9 @@ export const S02Constat: React.FC = () => {
           Une cote oubliée ?
         </div>
         <KeyPhrase phrase={S.phrases[2]} size={124} />
-      </div>
+      </TextBlock>
 
+      <Stage focus={{ x: 980, y: 170, w: 900, h: 850 }} region={{ y: 880, h: 760 }}>
       {/* ---------------- Scène de droite : carnet + télémètre ---------------- */}
       <div
         style={{
@@ -333,6 +336,7 @@ export const S02Constat: React.FC = () => {
           <Mascot height={260} mood="sad" look={[-0.8, 0.3]} seed={2} />
         </div>
       </div>
+      </Stage>
     </AbsoluteFill>
   );
 };

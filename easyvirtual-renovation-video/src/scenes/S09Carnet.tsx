@@ -5,6 +5,7 @@ import { Mascot } from "../components/Mascot";
 import { Check, Chip, Grid, KeyPhrase, Tag, useEnter } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
+import { Stage, TextBlock } from "../layout";
 import { HeartDoc } from "./S08Collectivites";
 
 const S = scene("carnet");
@@ -119,6 +120,7 @@ export const S09Carnet: React.FC = () => {
     <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Grid opacity={0.5} />
       <AbsoluteFill style={{ opacity: 1 - exit }}>
+        <Stage focus={{ x: 740, y: 140, w: 1180, h: 940 }} region={{ y: 680, h: 960 }}>
         {/* ---------------- tableau de bord ---------------- */}
         <div
           style={{
@@ -299,13 +301,14 @@ export const S09Carnet: React.FC = () => {
           <Mascot height={300} mood="wow" look={[-0.8, -0.6]} seed={9} />
         </div>
 
+        </Stage>
         {/* ---------------- textes ---------------- */}
-        <div style={{ position: "absolute", left: 130, top: 330, width: 580, opacity: 1 - toBA, translate: `${-toBA * 40}px 0` }}>
+        <TextBlock h={{ left: 130, top: 330, width: 580 }} v={{ top: 280 }} style={{ opacity: 1 - toBA, translate: `${-toBA * 40}px 0` }}>
           <KeyPhrase phrase={p0} size={112} />
-        </div>
-        <div style={{ position: "absolute", left: 130, top: 330, width: 600 }}>
+        </TextBlock>
+        <TextBlock h={{ left: 130, top: 330, width: 600 }} v={{ top: 270 }}>
           <KeyPhrase phrase={p1} size={100} marker />
-        </div>
+        </TextBlock>
       </AbsoluteFill>
     </AbsoluteFill>
   );

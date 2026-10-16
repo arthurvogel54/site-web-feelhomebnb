@@ -5,6 +5,7 @@ import { Mascot } from "../components/Mascot";
 import { KeyPhrase, Logo } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
+import { useV } from "../layout";
 
 const S = scene("outro");
 
@@ -18,6 +19,7 @@ export const S11Outro: React.FC = () => {
   const cursorT = prog(frame, ph.end + 10, click, EASE_IN_OUT);
   const mascotIn = pop(frame, cLogo + 14, 11, 120);
   const fadeOut = prog(frame, S.dur - 20, S.dur);
+  const v = useV();
 
   return (
     <AbsoluteFill style={{ background: C.orange, overflow: "hidden" }}>
@@ -29,8 +31,8 @@ export const S11Outro: React.FC = () => {
             key={k}
             style={{
               position: "absolute",
-              left: 960 - 1200,
-              top: 470 - 1200,
+              left: (v ? 540 : 960) - 1200,
+              top: (v ? 880 : 470) - 1200,
               width: 2400,
               height: 2400,
               borderRadius: "50%",
@@ -42,14 +44,14 @@ export const S11Outro: React.FC = () => {
         );
       })}
 
-      <div style={{ position: "absolute", left: 0, right: 0, top: 250, display: "flex", justifyContent: "center" }}>
-        <Logo size={164} animateFrom={cLogo - 10} />
+      <div style={{ position: "absolute", left: 0, right: 0, top: v ? 480 : 250, display: "flex", justifyContent: "center" }}>
+        <Logo size={v ? 112 : 164} animateFrom={cLogo - 10} />
       </div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 560, display: "flex", justifyContent: "center" }}>
-        <KeyPhrase phrase={ph} size={104} color={C.white} accent={C.ink} align="center" />
+      <div style={{ position: "absolute", left: 40, right: 40, top: v ? 780 : 560, display: "flex", justifyContent: "center" }}>
+        <KeyPhrase phrase={ph} size={v ? 88 : 104} color={C.white} accent={C.ink} align="center" />
       </div>
       {/* CTA */}
-      <div style={{ position: "absolute", left: 0, right: 0, top: 740, display: "flex", justifyContent: "center", scale: `${cta * (1 - press * 0.06)}` }}>
+      <div style={{ position: "absolute", left: 0, right: 0, top: v ? 1000 : 740, display: "flex", justifyContent: "center", scale: `${cta * (1 - press * 0.06)}` }}>
         <div
           style={{
             background: C.white,
@@ -58,7 +60,7 @@ export const S11Outro: React.FC = () => {
             padding: "26px 54px",
             fontFamily: F.title,
             fontWeight: 800,
-            fontSize: 50,
+            fontSize: v ? 44 : 50,
             display: "flex",
             alignItems: "center",
             gap: 22,
@@ -74,8 +76,8 @@ export const S11Outro: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            left: interpolate(cursorT, [0, 1], [1500, 1130]),
-            top: interpolate(cursorT, [0, 1], [1040, 800]),
+            left: v ? interpolate(cursorT, [0, 1], [900, 770]) : interpolate(cursorT, [0, 1], [1500, 1130]),
+            top: v ? interpolate(cursorT, [0, 1], [1450, 1060]) : interpolate(cursorT, [0, 1], [1040, 800]),
             scale: `${1 - press * 0.15}`,
             opacity: 1 - fadeOut,
           }}
@@ -89,8 +91,8 @@ export const S11Outro: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: 150,
-          top: 1080 - interpolate(mascotIn, [0, 1], [0, 470]),
+          left: v ? 80 : 150,
+          top: v ? 1920 - interpolate(mascotIn, [0, 1], [0, 760]) : 1080 - interpolate(mascotIn, [0, 1], [0, 470]),
           rotate: `${interpolate(mascotIn, [0, 1], [-25, -4])}deg`,
         }}
       >

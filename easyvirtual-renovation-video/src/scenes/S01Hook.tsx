@@ -5,6 +5,7 @@ import { Mascot } from "../components/Mascot";
 import { DimLine, Grid, KeyPhrase } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C } from "../theme";
+import { Stage, TextBlock } from "../layout";
 
 const S = scene("hook");
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -70,6 +71,7 @@ export const S01Hook: React.FC = () => {
     <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Grid opacity={prog(frame, 20, 50) * 0.7} drift={0.25} />
       <AbsoluteFill style={{ scale: `${push}`, translate: `0 ${-exit * 40}px` }}>
+        <Stage focus={{ x: 770, y: 120, w: 1130, h: 900 }} region={{ y: 700, h: 960 }}>
         {/* Façade */}
         <svg
           width={1920}
@@ -191,8 +193,9 @@ export const S01Hook: React.FC = () => {
           );
         })}
 
+        </Stage>
         {/* Phrase clé */}
-        <div style={{ position: "absolute", left: 130, top: 300, width: 800 }}>
+        <TextBlock h={{ left: 130, top: 300, width: 800 }} v={{ top: 280 }}>
           <KeyPhrase phrase={S.phrases[0]} size={124} marker />
           <div
             style={{
@@ -205,7 +208,7 @@ export const S01Hook: React.FC = () => {
               scale: `${prog(frame, S.phrases[0].end - 4, S.phrases[0].end + 14, EASE_IN_OUT)} 1`,
             }}
           />
-        </div>
+        </TextBlock>
       </AbsoluteFill>
     </AbsoluteFill>
   );

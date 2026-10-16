@@ -6,6 +6,7 @@ import { Mascot } from "../components/Mascot";
 import { Grid, KeyPhrase } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
+import { Stage, TextBlock } from "../layout";
 
 const S = scene("collectivites");
 const O: Iso = { ox: 1265, oy: 370, s: 63 };
@@ -83,6 +84,7 @@ export const S08Collectivites: React.FC = () => {
     <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Grid opacity={0.5} />
       <AbsoluteFill style={{ opacity: 1 - exit, scale: `${1 + exit * 0.06}` }}>
+        <Stage focus={{ x: 620, y: 50, w: 1290, h: 980 }} region={{ y: 720, h: 940 }}>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
           {/* sol + voirie */}
           <g opacity={ground} transform={`translate(0 ${(1 - ground) * 40})`}>
@@ -242,15 +244,16 @@ export const S08Collectivites: React.FC = () => {
           </div>
         </div>
 
+        </Stage>
         {/* textes */}
-        <div style={{ position: "absolute", left: 130, top: 300, width: 640, opacity: 1 - swap, translate: `${-swap * 40}px 0` }}>
+        <TextBlock h={{ left: 130, top: 300, width: 640 }} v={{ top: 270 }} style={{ opacity: 1 - swap, translate: `${-swap * 40}px 0` }}>
           <KeyPhrase phrase={p0} size={112} marker />
-        </div>
-        <div style={{ position: "absolute", left: 130, top: 290, width: 680 }}>
+        </TextBlock>
+        <TextBlock h={{ left: 130, top: 290, width: 680 }} v={{ top: 260 }}>
           <KeyPhrase phrase={p1} size={112} />
           <div style={{ height: 20 }} />
           <KeyPhrase phrase={p2} size={84} />
-        </div>
+        </TextBlock>
       </AbsoluteFill>
     </AbsoluteFill>
   );

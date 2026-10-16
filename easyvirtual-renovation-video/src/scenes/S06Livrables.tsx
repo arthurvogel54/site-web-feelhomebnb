@@ -5,6 +5,7 @@ import { EASE_IN, EASE_IN_OUT, pop, prog } from "../anim";
 import { Check, Grid, Tag, useEnter } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
+import { Stage, TextBlock } from "../layout";
 import { CameraRig, CutPlane, EnableClipping, HouseModel, Lights, PointCloud, project } from "../three/House3D";
 import { LX, LZ, ROOF, STATIONS, WALL_H } from "../three/houseData";
 
@@ -139,6 +140,7 @@ export const S06Livrables: React.FC = () => {
     <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Grid opacity={0.5} />
       <AbsoluteFill style={{ opacity: 1 - exit, translate: `0 ${-exit * 30}px` }}>
+        <Stage focus={{ x: 600, y: 40, w: 1320, h: 1000 }} region={{ y: 860, h: 800 }}>
         <div style={{ position: "absolute", left: CX, top: 0, width: CW, height: CH }}>
           <ThreeCanvas width={CW} height={CH} flat style={{ position: "absolute", inset: 0 }}>
             <EnableClipping />
@@ -230,8 +232,9 @@ export const S06Livrables: React.FC = () => {
           })}
         </div>
 
+        </Stage>
         {/* ---------- colonne gauche ---------- */}
-        <div style={{ position: "absolute", left: 130, top: 200, width: 600 }}>
+        <TextBlock h={{ left: 130, top: 200, width: 600 }} v={{ top: 230, width: 700, left: 190 }}>
           <div style={tag.style}>
             <Tag>Bureau d&apos;études</Tag>
           </div>
@@ -268,7 +271,7 @@ export const S06Livrables: React.FC = () => {
               );
             })}
           </div>
-        </div>
+        </TextBlock>
       </AbsoluteFill>
     </AbsoluteFill>
   );

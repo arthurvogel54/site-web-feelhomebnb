@@ -6,6 +6,7 @@ import { Mascot } from "../components/Mascot";
 import { Chip, Grid, KeyPhrase } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
+import { Stage, TextBlock } from "../layout";
 import { CameraRig, HouseModel, project } from "../three/House3D";
 import { LX, LZ } from "../three/houseData";
 
@@ -74,6 +75,7 @@ export const S05Visite: React.FC = () => {
     <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Grid opacity={0.5} />
       <AbsoluteFill style={{ opacity: 1 - exit, translate: `0 ${-exit * 30}px` }}>
+        <Stage focus={{ x: 620, y: 190, w: 1260, h: 800 }} region={{ y: 680, h: 820 }}>
         {/* ---------- fenêtre d'application ---------- */}
         <div
           style={{
@@ -210,11 +212,12 @@ export const S05Visite: React.FC = () => {
           );
         })()}
 
+        </Stage>
         {/* ---------- textes ---------- */}
-        <div style={{ position: "absolute", left: 130, top: 300, width: 500, opacity: 1 - swap, translate: `${-swap * 40}px 0` }}>
+        <TextBlock h={{ left: 130, top: 300, width: 500 }} v={{ top: 280 }} style={{ opacity: 1 - swap, translate: `${-swap * 40}px 0` }}>
           <KeyPhrase phrase={p1} size={100} />
-        </div>
-        <div style={{ position: "absolute", left: 130, top: 300, width: 500 }}>
+        </TextBlock>
+        <TextBlock h={{ left: 130, top: 300, width: 500 }} v={{ top: 250 }}>
           {(() => {
             const s = pop(frame, p2.start - 8, 11, 170);
             return (
@@ -230,7 +233,7 @@ export const S05Visite: React.FC = () => {
             );
           })()}
           <KeyPhrase phrase={p2} size={92} />
-        </div>
+        </TextBlock>
       </AbsoluteFill>
     </AbsoluteFill>
   );

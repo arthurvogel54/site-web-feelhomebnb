@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import { EASE_IN, EASE_IN_OUT, EASE_OUT } from "../anim";
 import { scene } from "../timeline";
 import { C } from "../theme";
@@ -24,6 +24,7 @@ const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
 export const Transitions: React.FC = () => {
   const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
   return (
     <>
       {CUTS.map((c) => {
@@ -31,15 +32,15 @@ export const Transitions: React.FC = () => {
         const d = frame - b;
         if (d < -16 || d > 18) return null;
         if (c.kind === "iris") {
-          const r = interpolate(d, [-14, 0], [0, 2300], { ...clamp, easing: EASE_IN });
+          const r = interpolate(d, [-14, 0], [0, 2.4 * Math.max(width, height)], { ...clamp, easing: EASE_IN });
           return (
             <AbsoluteFill key={c.to} style={{ pointerEvents: "none" }}>
               {d < 0 && (
                 <div
                   style={{
                     position: "absolute",
-                    left: c.x! * 1920 - r / 2,
-                    top: c.y! * 1080 - r / 2,
+                    left: c.x! * width - r / 2,
+                    top: c.y! * height - r / 2,
                     width: r,
                     height: r,
                     borderRadius: "50%",

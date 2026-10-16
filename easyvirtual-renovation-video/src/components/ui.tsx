@@ -1,5 +1,5 @@
 import React from "react";
-import { interpolate, useCurrentFrame } from "remotion";
+import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { BACK_OUT, EASE_IN, EASE_IN_OUT, EASE_OUT, pop, prog } from "../anim";
 import { Phrase } from "../timeline";
 import { C, F } from "../theme";
@@ -125,52 +125,47 @@ export const KeyPhrase: React.FC<{
 };
 
 /* ------------------------------------------------------------------ */
-/* Logo — wordmark easyVirtual.tours                                   */
+/* Logo — fichier officiel easyVirtual.tours (blanc, fond transparent)  */
+/* public/logo/ : wordmark + tagline séparés pour l'animation           */
 /* ------------------------------------------------------------------ */
+const LOGO_W = 1360;
+const WORDMARK_H = 152;
+const TAGLINE_H = 116;
+
 export const Logo: React.FC<{
-  size: number;
-  color?: string;
+  size: number; // échelle : largeur du logo ≈ size × 8,4 px
   tagline?: boolean;
-  animateFrom?: number; // frame de départ de l'animation lettre à lettre
-}> = ({ size, color = C.white, tagline = true, animateFrom }) => {
+  animateFrom?: number;
+}> = ({ size, tagline = true, animateFrom }) => {
   const frame = useCurrentFrame();
-  const letters = "easyVirtual.tours".split("");
+  const w = size * 8.4;
+  const k = w / LOGO_W;
+  const anim = animateFrom !== undefined;
+  const s = anim ? pop(frame, animateFrom, 12, 140, 0.8) : 1;
+  const wipe = anim ? prog(frame, animateFrom, animateFrom + 16, EASE_OUT) : 1;
+  const tag = anim ? prog(frame, animateFrom + 14, animateFrom + 30) : 1;
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", color }}>
-      <div style={{ fontFamily: F.logo, fontSize: size, lineHeight: 1, letterSpacing: "-0.015em", display: "flex" }}>
-        {letters.map((l, i) => {
-          const s = animateFrom === undefined ? 1 : pop(frame, animateFrom + i * 1.4, 11, 190, 0.6);
-          return (
-            <span
-              key={i}
-              style={{
-                display: "inline-block",
-                translate: `0 ${interpolate(s, [0, 1], [size * 0.5, 0])}px`,
-                scale: `${interpolate(s, [0, 1], [0.4, 1])}`,
-                opacity: interpolate(s, [0, 0.25], [0, 1], clamp),
-                transformOrigin: "center bottom",
-              }}
-            >
-              {l}
-            </span>
-          );
-        })}
-        <sup style={{ fontFamily: F.body, fontSize: size * 0.2, marginLeft: size * 0.04, marginTop: size * 0.05, opacity: animateFrom === undefined ? 1 : prog(frame, animateFrom + 26, animateFrom + 36) }}>®</sup>
-      </div>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: w }}>
+      <Img
+        src={staticFile("logo/logo-wordmark.png")}
+        style={{
+          width: w,
+          height: WORDMARK_H * k,
+          clipPath: `inset(-10% ${(1 - wipe) * 100}% -10% 0)`,
+          scale: `${interpolate(s, [0, 1], [0.86, 1])}`,
+          translate: `0 ${interpolate(s, [0, 1], [size * 0.25, 0])}px`,
+        }}
+      />
       {tagline && (
-        <div
+        <Img
+          src={staticFile("logo/logo-tagline.png")}
           style={{
-            fontFamily: F.body,
-            fontWeight: 500,
-            fontSize: size * 0.3,
-            marginTop: size * 0.16,
-            opacity: animateFrom === undefined ? 1 : prog(frame, animateFrom + 28, animateFrom + 44),
-            translate: `0 ${animateFrom === undefined ? 0 : (1 - prog(frame, animateFrom + 28, animateFrom + 44)) * 20}px`,
+            width: w,
+            height: TAGLINE_H * k,
+            opacity: tag,
+            translate: `0 ${(1 - tag) * size * 0.15}px`,
           }}
-        >
-          Part of the <span style={{ fontFamily: F.logo }}>easy</span>
-          <sup style={{ fontSize: "0.55em" }}>®</sup> family of brands
-        </div>
+        />
       )}
     </div>
   );
