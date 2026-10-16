@@ -11,11 +11,12 @@ import { getCloud, STATIONS } from "../three/houseData";
 const S = scene("scan");
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
-/** planning du scan : chaque station tourne ~42 frames puis saute à la suivante */
-const START = 14;
-const SCAN = 40;
-const MOVE = 12;
-export const stationTimes = STATIONS.map((_, i) => START + i * (SCAN + MOVE));
+/** planning du scan : réparti entre le début de la scène et la chute « Environ une heure » */
+const START = 12;
+const PER = Math.max(24, (S.phrases[0].start - 26 - START) / STATIONS.length);
+const SCAN = Math.round(PER * 0.78);
+const MOVE = Math.round(PER * 0.22);
+export const stationTimes = STATIONS.map((_, i) => Math.round(START + i * PER));
 
 export const S04Scan: React.FC = () => {
   const frame = useCurrentFrame();
@@ -24,7 +25,7 @@ export const S04Scan: React.FC = () => {
   const H = 1080;
 
   // caméra : gros plan sur la mascotte → plan large en orbite
-  const pull = prog(frame, 6, 120, EASE_IN_OUT);
+  const pull = prog(frame, 6, Math.min(120, stationTimes[2]), EASE_IN_OUT);
   const orbit = interpolate(frame, [0, S.dur], [-0.55, 0.35]);
   const dist = lerp(5, 17, pull);
   const height = lerp(2.4, 12.5, pull);

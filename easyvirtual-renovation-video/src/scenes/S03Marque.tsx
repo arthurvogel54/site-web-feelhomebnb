@@ -69,7 +69,7 @@ export const S03Marque: React.FC = () => {
             top: 790,
             display: "flex",
             justifyContent: "center",
-            scale: `${pop(frame, ph.end - 6, 9, 200)}`,
+            scale: `${pop(frame, Math.min(ph.end - 6, ph.start + 24), 9, 200)}`,
           }}
         >
           <Sticker size={44} rotate={-3}>

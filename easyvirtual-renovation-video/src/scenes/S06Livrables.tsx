@@ -81,8 +81,8 @@ export const S06Livrables: React.FC = () => {
   ];
 
   // ---- états de la maquette ----
-  const pointsOp = 1 - prog(frame, 70, 120);
-  const wire = prog(frame, cBureau + 10, cBureau + 80, EASE_IN_OUT);
+  const pointsOp = 1 - prog(frame, cBureau + 40, cPlans - 6);
+  const wire = prog(frame, cBureau + 10, Math.min(cBureau + 80, cPlans - 10), EASE_IN_OUT);
   const solid = prog(frame, cPlans - 8, cPlans + 10);
   const hideUpper = keys(frame, [
     [cPlans - 4, 0],

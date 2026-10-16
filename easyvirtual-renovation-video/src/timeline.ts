@@ -198,7 +198,7 @@ const build = () => {
   // temps absolus (s) de chaque mot
   let abs: { start: number; end: number }[][];
   if (VO.words && VO.words.length) {
-    const flat = alignWords(parsed.flat(), VO.words);
+    const flat = alignWords(parsed.flat(), VO.words).map((w) => ({ start: w.start + VO.offset, end: w.end + VO.offset }));
     let c = 0;
     abs = parsed.map((ws) => ws.map(() => flat[c++]));
   } else if (VO.segments && VO.segments.length) {
@@ -206,7 +206,7 @@ const build = () => {
       const s = VO.segments!.find((x) => x.id === SCRIPT[i].id);
       const total = ws[ws.length - 1].end;
       const scale = s ? (s.end - s.start) / total : 1;
-      const base = s ? s.start : 0;
+      const base = (s ? s.start : 0) + VO.offset;
       return ws.map((w) => ({ start: base + w.start * scale, end: base + w.end * scale }));
     });
   } else {

@@ -47,6 +47,10 @@ export const Main: React.FC = () => (
     <Transitions />
     <Audio src={staticFile("audio/music.mp3")} volume={musicVolume} />
     <Audio src={staticFile("audio/sfx.mp3")} volume={MIX.sfx} />
-    {VO.audioFile && <Audio src={staticFile(VO.audioFile)} volume={MIX.voice} />}
+    {VO.audioFile && (
+      <Sequence from={Math.round(VO.offset * FPS)} name="voix off" layout="none">
+        <Audio src={staticFile(VO.audioFile)} volume={MIX.voice} />
+      </Sequence>
+    )}
   </AbsoluteFill>
 );
