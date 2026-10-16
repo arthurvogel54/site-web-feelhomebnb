@@ -22,7 +22,10 @@ ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 SR = 44100
 rng = np.random.default_rng(7)
 
-cues = json.load(open(os.path.join(HERE, "cues.json")))
+# usage : compose.py [cues.json] [préfixe de sortie]
+CUES_FILE = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "cues.json")
+OUT_PREFIX = sys.argv[2] if len(sys.argv) > 2 else ""
+cues = json.load(open(CUES_FILE))
 TOTAL = cues["total"]
 SC = cues["scenes"]
 BRAND = SC["marque"]["start"]
@@ -352,5 +355,5 @@ def write(buf, name):
     print("→", os.path.relpath(mp3, ROOT))
 
 
-write(master(music, -1.5), "music")
-write(master(sfx, -3.0), "sfx")
+write(master(music, -1.5), OUT_PREFIX + "music")
+write(master(sfx, -3.0), OUT_PREFIX + "sfx")
