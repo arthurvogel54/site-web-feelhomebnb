@@ -13,7 +13,7 @@ export type RealSegment = { id: string; start: number; end: number };
 
 export const VO: {
   audioFile: string | null; // fichier dans /public, ex. "voiceover.wav"
-  offset: number; // s : la voix démarre après ce délai (laisse l'intro respirer)
+  offset: number; // s : décalage global (uniquement sans timings par mot ; sinon la voix est découpée par segment)
   words: RealWord[] | null;
   segments: RealSegment[] | null;
 } = {

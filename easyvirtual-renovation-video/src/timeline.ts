@@ -182,6 +182,9 @@ export const alignWords = (script: { spoken: string; display: string }[], real: 
   return out;
 };
 
+/** morceaux de la voix off à poser sur la timeline (secondes) : at = position, from/to = découpe dans le fichier */
+export const AUDIO_CLIPS: { id: string; at: number; from: number; to: number }[] = [];
+
 // ---------- 4. Construction de la timeline ----------
 const build = () => {
   const parsed = SCRIPT.map(parse);
@@ -198,9 +201,24 @@ const build = () => {
   // temps absolus (s) de chaque mot
   let abs: { start: number; end: number }[][];
   if (VO.words && VO.words.length) {
-    const flat = alignWords(parsed.flat(), VO.words).map((w) => ({ start: w.start + VO.offset, end: w.end + VO.offset }));
+    // voix réelle : chaque segment garde son débit, mais on insère les respirations du script
+    const flat = alignWords(parsed.flat(), VO.words);
     let c = 0;
-    abs = parsed.map((ws) => ws.map(() => flat[c++]));
+    const raw = parsed.map((ws) => ws.map(() => flat[c++]));
+    let t = 0;
+    abs = raw.map((ws, i) => {
+      const rs = ws[0].start;
+      const re = ws[ws.length - 1].end;
+      t += SCRIPT[i].leadIn;
+      const shift = t - rs;
+      const prevEnd = i > 0 ? raw[i - 1][raw[i - 1].length - 1].end : 0;
+      const nextStart = i < raw.length - 1 ? raw[i + 1][0].start : re + 1;
+      const padIn = Math.min(0.15, Math.max(0, (rs - prevEnd) / 2));
+      const padOut = Math.min(0.25, Math.max(0, (nextStart - re) / 2));
+      AUDIO_CLIPS.push({ id: SCRIPT[i].id, at: rs - padIn + shift, from: rs - padIn, to: re + padOut });
+      t = re + shift + SCRIPT[i].tail;
+      return ws.map((w) => ({ start: w.start + shift, end: w.end + shift }));
+    });
   } else if (VO.segments && VO.segments.length) {
     abs = est.map((ws, i) => {
       const s = VO.segments!.find((x) => x.id === SCRIPT[i].id);

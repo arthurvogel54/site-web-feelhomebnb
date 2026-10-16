@@ -5,7 +5,7 @@ import "./theme";
 import { Chrome } from "./components/Chrome";
 import { Transitions } from "./components/Transitions";
 import { SCENE_COMPONENTS } from "./scenes";
-import { SCENES } from "./timeline";
+import { AUDIO_CLIPS, SCENES, TOTAL_FRAMES } from "./timeline";
 import { FPS } from "./theme";
 import { C } from "./theme";
 import { VO } from "./vo-timings";
@@ -19,19 +19,23 @@ export const MIX = {
   voice: 1,
 };
 
-// intervalles (en frames) où la voix parle, pour baisser la musique dessous
-const VOICE_SPANS = SCENES.flatMap((s) => s.words.map((w) => [s.from + w.at, s.from + w.endAt] as const));
-const isSpeaking = (f: number) => VOICE_SPANS.some(([a, b]) => f >= a - 4 && f <= b + 8);
-const ATTACK = Math.round(FPS * 0.25);
-
-const musicVolume = (f: number) => {
-  if (!VO.audioFile) return MIX.music;
-  // lissage : moyenne glissante de l'état "parle" sur ~0,25 s
-  let n = 0;
-  for (let k = -ATTACK; k <= ATTACK; k++) n += isSpeaking(f + k) ? 1 : 0;
-  const speak = n / (2 * ATTACK + 1);
-  return MIX.musicBetweenWords + (MIX.musicUnderVoice - MIX.musicBetweenWords) * speak;
-};
+// Volume de la musique précalculé image par image : baisse sous la voix (ducking), lissée sur ~0,25 s
+const MUSIC_VOLUME = (() => {
+  const speaking = new Uint8Array(TOTAL_FRAMES + 1);
+  for (const s of SCENES)
+    for (const w of s.words)
+      for (let f = Math.max(0, s.from + w.at - 4); f <= Math.min(TOTAL_FRAMES, s.from + w.endAt + 8); f++) speaking[f] = 1;
+  const r = Math.round(FPS * 0.25);
+  const vol = new Float32Array(TOTAL_FRAMES + 1);
+  for (let f = 0; f <= TOTAL_FRAMES; f++) {
+    let n = 0;
+    for (let k = -r; k <= r; k++) n += speaking[Math.min(TOTAL_FRAMES, Math.max(0, f + k))];
+    const speak = n / (2 * r + 1);
+    vol[f] = MIX.musicBetweenWords + (MIX.musicUnderVoice - MIX.musicBetweenWords) * speak;
+  }
+  return vol;
+})();
+const musicVolume = (f: number) => (VO.audioFile ? MUSIC_VOLUME[Math.min(TOTAL_FRAMES, Math.max(0, Math.round(f)))] : MIX.music);
 
 export const Main: React.FC = () => (
   <AbsoluteFill style={{ background: C.white }}>
@@ -47,10 +51,22 @@ export const Main: React.FC = () => (
     <Transitions />
     <Audio src={staticFile("audio/music.mp3")} volume={musicVolume} />
     <Audio src={staticFile("audio/sfx.mp3")} volume={MIX.sfx} />
-    {VO.audioFile && (
-      <Sequence from={Math.round(VO.offset * FPS)} name="voix off" layout="none">
-        <Audio src={staticFile(VO.audioFile)} volume={MIX.voice} />
-      </Sequence>
-    )}
+    {VO.audioFile &&
+      (AUDIO_CLIPS.length ? (
+        AUDIO_CLIPS.map((c) => (
+          <Sequence key={c.id} from={Math.round(c.at * FPS)} name={`voix · ${c.id}`} layout="none">
+            <Audio
+              src={staticFile(VO.audioFile!)}
+              trimBefore={Math.round(c.from * FPS)}
+              trimAfter={Math.round(c.to * FPS)}
+              volume={MIX.voice}
+            />
+          </Sequence>
+        ))
+      ) : (
+        <Sequence from={Math.round(VO.offset * FPS)} name="voix off" layout="none">
+          <Audio src={staticFile(VO.audioFile)} volume={MIX.voice} />
+        </Sequence>
+      ))}
   </AbsoluteFill>
 );

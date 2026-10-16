@@ -130,7 +130,7 @@ export const S06Livrables: React.FC = () => {
   const bimTags = [
     { t: "IfcRoof", p: [-1, WALL_H + ROOF.rise * 0.6 + explode * 3.6, -1.5] as [number, number, number], d: 0 },
     { t: "IfcWall", p: [LX / 2, 1.8, 2.5] as [number, number, number], d: 4 },
-    { t: "IfcWindow", p: [4.4, 1.5, LZ / 2] as [number, number, number], d: 8 },
+    { t: "IfcWindow", p: [LX / 2, 1.5, -2.05] as [number, number, number], d: 8 },
     { t: "IfcSlab", p: [-LX / 2 + 1, -0.15 - explode * 1.4, LZ / 2] as [number, number, number], d: 12 },
   ];
   const cutLabel = proj([cut, WALL_H + 1.6, -LZ / 2 - 0.4]);
