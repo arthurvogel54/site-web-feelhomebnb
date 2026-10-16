@@ -24,7 +24,8 @@ npm run script     # régénère SCRIPT-VOIX-OFF.md (minutage à jour)
 | `src/vo-timings.ts` | Timings de la voix réelle (vide tant que la voix n'est pas enregistrée) |
 | `src/scenes/S01…S11` | Les 11 scènes, chacune visible seule dans le Studio (dossier *Scenes*) |
 | `src/three/` | Maison 3D procédurale : nuage de points LiDAR, filaire, BIM, coupe, éclaté |
-| `src/components/Mascot.tsx` | La mascotte (caméra 360° dont les objectifs sont les yeux) |
+| `src/components/Mascot.tsx` | La mascotte : l'ours et sa caméra (`public/mascotte/ours.png`), animé par le mouvement |
+| `scripts/music/compose.py` | Musique originale + bruitages synthétisés, calés sur la timeline |
 | `src/components/Transitions.tsx` | Volets noir/orange et iris entre les scènes |
 | `public/fonts/` | Jost (titrage façon Futura de la plaquette), Inter, Fraunces Soft (logo), Caveat |
 
@@ -48,11 +49,21 @@ chaque segment (`hook`, `constat`, …), le début et la fin de la voix en secon
 Si le texte enregistré diffère du script, modifier `src/script.ts` en conséquence (l'alignement tolère
 quelques mots ajoutés ou manquants).
 
-## Remplacer la mascotte
+## Mascotte
 
-Toutes les scènes utilisent `<Mascot />`. Pour utiliser le dessin officiel, remplacer le contenu de
-`src/components/Mascot.tsx` (SVG ou image) en gardant ses props (`mood`, `look`, `wave`, `scanning`…).
-La version 3D (scène Scan) est `ScannerBot` dans `src/three/House3D.tsx`.
+L'ours est l'image `public/mascotte/ours.png` (PNG détouré). Pour changer d'illustration, remplacer ce
+fichier (et ajuster `BEAR.ratio` / `BEAR.lens` dans `src/components/Mascot.tsx` si le cadrage change).
+En 3D (scène Scan), il est affiché en panneau face caméra (`ScannerBot`, `src/three/House3D.tsx`).
+
+## Musique
+
+```bash
+npx tsx scripts/music/export-cues.ts   # repères de la timeline
+python3 scripts/music/compose.py       # → public/audio/music.mp3 + sfx.mp3 (numpy, scipy, ffmpeg)
+```
+
+À relancer après la synchro de la voix off pour recaler les temps forts. Les volumes (et la baisse
+automatique de la musique sous la voix) se règlent dans `MIX`, `src/Main.tsx`.
 
 ## À valider avant diffusion
 

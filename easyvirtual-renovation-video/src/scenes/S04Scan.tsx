@@ -5,7 +5,7 @@ import { EASE_IN, EASE_IN_OUT, EASE_OUT, lerp, pop, prog } from "../anim";
 import { Card, Chip, Grid, KeyPhrase, useEnter } from "../components/ui";
 import { cue, scene } from "../timeline";
 import { C, F } from "../theme";
-import { CameraRig, HouseModel, LaserFan, Lights, PointCloud, ScannerBot } from "../three/House3D";
+import { CameraRig, HouseModel, LaserFan, Lights, PointCloud, ScannerBot, useBearTexture } from "../three/House3D";
 import { getCloud, STATIONS } from "../three/houseData";
 
 const S = scene("scan");
@@ -19,6 +19,7 @@ export const stationTimes = STATIONS.map((_, i) => START + i * (SCAN + MOVE));
 
 export const S04Scan: React.FC = () => {
   const frame = useCurrentFrame();
+  const bearTex = useBearTexture();
   const W = 1920;
   const H = 1080;
 
@@ -78,14 +79,14 @@ export const S04Scan: React.FC = () => {
     <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Grid opacity={0.5} />
       <AbsoluteFill style={{ opacity: 1 - exit, scale: `${1 + exit * 0.04}` }}>
-        <ThreeCanvas width={W} height={H} flat style={{ position: "absolute", inset: 0 }}>
+        {bearTex && <ThreeCanvas width={W} height={H} flat style={{ position: "absolute", inset: 0 }}>
           <CameraRig pos={camPos} target={tgt} fov={34} />
           <Lights />
           <HouseModel opacity={0} wire={1} wireOpacity={0.14 * pull * (1 - allRevealed * 0.5)} lineWidth={1.2} furniture={0} resolution={[W, H]} />
           <PointCloud radii={radii} all={allRevealed} size={1.7} />
           {!scanDone && <LaserFan position={botPos} angle={rotY - Math.PI / 2} opacity={scanning} reach={4.5} />}
-          <ScannerBot position={botPos} rotY={rotY + Math.atan2(camPos[0] - botPos[0], camPos[2] - botPos[2])} scanning={scanning} hop={hop} scale={lerp(1.1, 1.6, pull)} />
-        </ThreeCanvas>
+          <ScannerBot position={botPos} faceY={Math.atan2(camPos[0] - botPos[0], camPos[2] - botPos[2])} spin={rotY} tex={bearTex} scanning={scanning} hop={hop} scale={lerp(1, 1.25, pull)} />
+        </ThreeCanvas>}
 
         {/* puces techniques */}
         <div style={{ position: "absolute", left: 130, top: 160, display: "flex", gap: 16 }}>

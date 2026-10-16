@@ -74,16 +74,6 @@ export const S05Visite: React.FC = () => {
     <AbsoluteFill style={{ background: C.white, overflow: "hidden" }}>
       <Grid opacity={0.5} />
       <AbsoluteFill style={{ opacity: 1 - exit, translate: `0 ${-exit * 30}px` }}>
-        {/* mascotte qui jette un œil */}
-        {(() => {
-          const s = pop(frame, cOubliee - 4, 12, 120);
-          return (
-            <div style={{ position: "absolute", left: WIN.x + WIN.w - 180 + s * 80, top: WIN.y + WIN.h - 300, rotate: `${s * 14}deg` }}>
-              <Mascot height={262} mood={done ? "wow" : "focus"} look={[-0.9, -0.4]} seed={5} />
-            </div>
-          );
-        })()}
-
         {/* ---------- fenêtre d'application ---------- */}
         <div
           style={{
@@ -209,6 +199,16 @@ export const S05Visite: React.FC = () => {
             {tool && frame < S.dur && <Cursor x={cur.x} y={cur.y} press={Math.max(pressA, pressB)} />}
           </div>
         </div>
+
+        {/* mascotte qui jette un œil */}
+        {(() => {
+          const s = pop(frame, cOubliee - 4, 12, 120);
+          return (
+            <div style={{ position: "absolute", left: WIN.x + WIN.w - 120 + (1 - s) * 400, top: WIN.y + WIN.h - 250, rotate: `${(1 - s) * 20}deg` }}>
+              <Mascot height={330} flip mood={done ? "wow" : "focus"} look={[-0.9, -0.4]} seed={5} />
+            </div>
+          );
+        })()}
 
         {/* ---------- textes ---------- */}
         <div style={{ position: "absolute", left: 130, top: 300, width: 500, opacity: 1 - swap, translate: `${-swap * 40}px 0` }}>

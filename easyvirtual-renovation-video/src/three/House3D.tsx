@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { continueRender, delayRender, staticFile } from "remotion";
 import * as THREE from "three";
 import { useThree } from "@react-three/fiber";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { C } from "../theme";
+import { BEAR } from "../components/Mascot";
 import { Box, getBoxes, getCloud, LX, LZ, ROOF, STATIONS, WALL_H } from "./houseData";
 
 /* ------------------------------------------------------------------ */
@@ -312,51 +314,63 @@ export const HouseModel: React.FC<ModelProps> = ({
 };
 
 /* ------------------------------------------------------------------ */
-/* La mascotte en 3D — le scanner sur trépied                          */
+/* La mascotte en 3D — l'ours et sa caméra, en panneau face caméra      */
 /* ------------------------------------------------------------------ */
-export const ScannerBot: React.FC<{ position: [number, number, number]; rotY: number; scanning: number; scale?: number; hop?: number }> = ({
-  position,
-  rotY,
-  scanning,
-  scale = 1,
-  hop = 0,
-}) => {
-  const legs = [0, 1, 2].map((k) => (k * Math.PI * 2) / 3);
+/** à appeler HORS du <ThreeCanvas> : la texture est prête avant le premier rendu GL */
+export const useBearTexture = () => {
+  const [tex, setTex] = useState<THREE.Texture | null>(null);
+  const [handle] = useState(() => delayRender("texture ours"));
+  useEffect(() => {
+    new THREE.TextureLoader().load(
+      staticFile(BEAR.src),
+      (t) => {
+        t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = 8;
+        setTex(t);
+        continueRender(handle);
+      },
+      undefined,
+      () => continueRender(handle),
+    );
+  }, [handle]);
+  return tex;
+};
+
+export const BEAR_H = 1.75; // m — l'objectif tombe à ≈ 1,37 m, hauteur réelle d'un scanner sur trépied
+
+export const ScannerBot: React.FC<{
+  position: [number, number, number];
+  faceY: number; // orientation vers la caméra
+  spin: number; // rotation sur lui-même (rad) — simulée par un retournement
+  scanning: number;
+  scale?: number;
+  hop?: number;
+  tex: THREE.Texture | null;
+}> = ({ position, faceY, spin, scanning, scale = 1, hop = 0, tex }) => {
+  const w = BEAR_H * BEAR.ratio;
+  const turn = Math.cos(spin);
+  const sx = Math.abs(turn) < 0.05 ? 0.05 * Math.sign(turn || 1) : turn;
+  const lensX = (BEAR.lens.x - 0.5) * w * sx;
+  const lensY = BEAR_H * (1 - BEAR.lens.y);
+  if (!tex) return null;
   return (
-    <group position={[position[0], 0, position[2]]} scale={scale}>
-      {/* trépied */}
-      {legs.map((a, i) => (
-        <mesh key={i} position={[Math.cos(a) * 0.18, 0.42, Math.sin(a) * 0.18]} rotation={[-Math.sin(a) * 0.4, 0, Math.cos(a) * 0.4]}>
-          <cylinderGeometry args={[0.025, 0.025, 0.9, 8]} />
-          <meshStandardMaterial color={C.ink} />
+    <group position={[position[0], hop, position[2]]} rotation={[0, faceY, 0]} scale={scale}>
+      <mesh position={[0, BEAR_H / 2, 0]} scale={[sx, 1, 1]}>
+        <planeGeometry args={[w, BEAR_H]} />
+        <meshBasicMaterial map={tex} transparent alphaTest={0.4} side={THREE.DoubleSide} toneMapped={false} />
+      </mesh>
+      {/* ombre */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01 - hop, 0]}>
+        <circleGeometry args={[w * 0.4, 32]} />
+        <meshBasicMaterial color="#000" transparent opacity={0.09} depthWrite={false} />
+      </mesh>
+      {/* lueur de l'objectif pendant le scan */}
+      {scanning > 0 && (
+        <mesh position={[lensX, lensY, 0.02]}>
+          <circleGeometry args={[0.07 + Math.sin(spin * 6) * 0.01, 24]} />
+          <meshBasicMaterial color="#FFB27A" transparent opacity={0.85} depthWrite={false} />
         </mesh>
-      ))}
-      <group position={[0, 1.05 + hop, 0]} rotation={[0, rotY, 0]}>
-        <mesh>
-          <capsuleGeometry args={[0.22, 0.22, 8, 24]} />
-          <meshStandardMaterial color={C.orange} roughness={0.5} />
-        </mesh>
-        {/* face */}
-        <mesh position={[0, 0.06, 0.17]} scale={[1, 0.8, 0.5]}>
-          <sphereGeometry args={[0.15, 24, 16]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.4} />
-        </mesh>
-        {[-0.065, 0.065].map((x) => (
-          <mesh key={x} position={[x, 0.08, 0.235]}>
-            <sphereGeometry args={[0.042, 16, 12]} />
-            <meshStandardMaterial color={C.ink} roughness={0.2} metalness={0.3} />
-          </mesh>
-        ))}
-        {/* antenne LiDAR */}
-        <mesh position={[0, 0.42, 0]}>
-          <cylinderGeometry args={[0.015, 0.015, 0.14, 8]} />
-          <meshStandardMaterial color={C.ink} />
-        </mesh>
-        <mesh position={[0, 0.5, 0]}>
-          <sphereGeometry args={[0.045 + scanning * 0.02, 16, 12]} />
-          <meshBasicMaterial color={scanning > 0.5 ? "#FFD2B0" : C.ink} />
-        </mesh>
-      </group>
+      )}
     </group>
   );
 };
@@ -370,7 +384,7 @@ export const LaserFan: React.FC<{ position: [number, number, number]; angle: num
 }) => {
   if (opacity <= 0.001) return null;
   return (
-    <group position={[position[0], 1.3, position[2]]} rotation={[0, angle, 0]}>
+    <group position={[position[0], 1.37, position[2]]} rotation={[0, angle, 0]}>
       <mesh position={[reach / 2, 0, 0]}>
         <planeGeometry args={[reach, 2.6]} />
         <meshBasicMaterial color={C.orange} transparent opacity={opacity * 0.16} side={THREE.DoubleSide} depthWrite={false} />

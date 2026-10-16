@@ -202,8 +202,8 @@ export const S08Collectivites: React.FC = () => {
 
         {/* mascotte */}
         {mascotVis > 0.01 && (
-          <div style={{ position: "absolute", left: mPos.x - 47, top: mPos.y - 128, opacity: mascotVis }}>
-            <Mascot height={130} mood="happy" scanning={ht > 0.9 || frame > hopStart + 44} look={[0, 0.3]} seed={8} squash={ht > 0.95 ? Math.sin((frame % 11) / 11 * Math.PI) * 0.4 : 0} />
+          <div style={{ position: "absolute", left: mPos.x - 46, top: mPos.y - 166, opacity: mascotVis }}>
+            <Mascot height={170} mood="happy" scanning={ht > 0.9 || frame > hopStart + 44} look={[0, 0.3]} seed={8} squash={ht > 0.95 ? Math.sin((frame % 11) / 11 * Math.PI) * 0.4 : 0} />
           </div>
         )}
 
