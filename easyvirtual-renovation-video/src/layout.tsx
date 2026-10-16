@@ -27,8 +27,14 @@ export const Stage: React.FC<{ focus: Rect; region: { y: number; h: number }; ch
   const s = Math.min(1040 / focus.w, region.h / focus.h);
   const dx = (1080 - focus.w * s) / 2 - focus.x * s;
   const dy = region.y + (region.h - focus.h * s) / 2 - focus.y * s;
+  // fondu doux en haut et en bas de la bande : aucun bord net si le visuel déborde
+  const a = Math.max(0, region.y - 70);
+  const b = region.y + 40;
+  const c = region.y + region.h - 40;
+  const d = region.y + region.h + 70;
+  const mask = `linear-gradient(to bottom, transparent ${a}px, #000 ${b}px, #000 ${c}px, transparent ${d}px)`;
   return (
-    <AbsoluteFill style={style}>
+    <AbsoluteFill style={{ ...style, maskImage: mask, WebkitMaskImage: mask }}>
       <div
         style={{
           position: "absolute",
