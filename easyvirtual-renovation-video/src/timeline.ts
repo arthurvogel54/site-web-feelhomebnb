@@ -1,6 +1,8 @@
-import { SCRIPT, SegmentDef } from "./script";
+import { SCRIPT as MAIN_SCRIPT, SegmentDef } from "./script";
 import { FPS } from "./theme";
-import { RealWord, VO } from "./vo-timings";
+import { RealWord, VO as MAIN_VO } from "./vo-timings";
+
+export type VoConfig = typeof MAIN_VO;
 
 export type Word = {
   display: string;
@@ -183,10 +185,12 @@ export const alignWords = (script: { spoken: string; display: string }[], real: 
 };
 
 /** morceaux de la voix off à poser sur la timeline (secondes) : at = position, from/to = découpe dans le fichier */
-export const AUDIO_CLIPS: { id: string; at: number; from: number; to: number }[] = [];
+export type AudioClip = { id: string; at: number; from: number; to: number };
 
 // ---------- 4. Construction de la timeline ----------
-const build = () => {
+/** construit une timeline (scènes, mots, morceaux de voix) pour un script et une voix donnés */
+export const makeTimeline = (SCRIPT: SegmentDef[], VO: VoConfig) => {
+  const AUDIO_CLIPS: AudioClip[] = [];
   const parsed = SCRIPT.map(parse);
   const est = parsed.map((ws) => {
     let t = 0;
@@ -267,11 +271,19 @@ const build = () => {
     }
     return { id: seg.id, section: seg.section, index: i, from, dur: to - from, words, phrases };
   });
-  return scenes;
+  const total = scenes[scenes.length - 1].from + scenes[scenes.length - 1].dur;
+  const sceneOf = (id: string) => {
+    const s = scenes.find((x) => x.id === id);
+    if (!s) throw new Error(`scene ${id} introuvable`);
+    return s;
+  };
+  return { scenes, total, clips: AUDIO_CLIPS, scene: sceneOf };
 };
 
-export const SCENES = build();
-export const TOTAL_FRAMES = SCENES[SCENES.length - 1].from + SCENES[SCENES.length - 1].dur;
+const MAIN = makeTimeline(MAIN_SCRIPT, MAIN_VO);
+export const SCENES = MAIN.scenes;
+export const TOTAL_FRAMES = MAIN.total;
+export const AUDIO_CLIPS = MAIN.clips;
 
 export const scene = (id: string) => {
   const s = SCENES.find((x) => x.id === id);

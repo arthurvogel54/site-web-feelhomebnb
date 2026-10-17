@@ -18,7 +18,7 @@ import { VO } from "./vo-timings";
  */
 const MIX = { underVoice: 0.24, between: 0.45, sfx: 0.55, voice: 1 };
 
-const SpotTransitions: React.FC<{ cuts: { at: number; kind: "panel" | "iris" }[] }> = ({ cuts }) => {
+export const SpotTransitions: React.FC<{ cuts: { at: number; kind: "panel" | "iris" }[] }> = ({ cuts }) => {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
   const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
