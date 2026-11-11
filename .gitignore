@@ -1,3 +1,6 @@
 .vercel/
 node_modules/
 .DS_Store
+
+# Rendered videos (too large for GitHub)
+videos/
