@@ -1,6 +1,6 @@
 import numpy as np, wave, sys
 from numpy.fft import rfft, irfft
-SR=48000; DUR=76.5; N=int(SR*DUR); rng=np.random.default_rng(7)
+SR=48000; DUR=float(sys.argv[2]) if len(sys.argv)>2 else 76.5; N=int(SR*DUR); rng=np.random.default_rng(7)
 t=np.arange(N)/SR
 def hz(m): return 440*2**((m-69)/12)
 # D major, 8s per chord: Dmaj9, Bm9, Gmaj7(9), A(sus4->)  
@@ -13,7 +13,7 @@ def env(n,a,r):
     e[-ri:]*=np.cos(np.linspace(0,np.pi/2,ri))**2
     return e
 k=0; st=0.0
-while st<DUR:
+while st<DUR-5.6:
     ch=CH[k%4]; s0=int(st*SR); n=min(int((seg+3)*SR),N-s0)
     tt=np.arange(n)/SR; e=env(n,2.5,3.0)
     for j,m in enumerate(ch):
